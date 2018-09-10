@@ -13,28 +13,38 @@ public class Sintatico {
 	
 	public static void exercicio1G1() {
 		Gramatica gG = new Gramatica();
-		Token _a = new Token("A",false);
-		Token y = new Token("y",true);
-		Token k = new Token("k",true);
-		Token x = new Token("x",true);
-		Token m = new Token("m",true);
-		Token r = new Token("r",true);
-		Token _w = new Token("W",false);
-		Token _1 = new Token("1",true);
+		HashMap<String, Boolean> tiposDeSimbolo = gG.getTiposDeSimbolo();
+		tiposDeSimbolo.put("A", false); //A é um token não-terminal
+		tiposDeSimbolo.put("y",true);
+		tiposDeSimbolo.put("k",true);
+		tiposDeSimbolo.put("x",true);
+		tiposDeSimbolo.put("m",true);
+		tiposDeSimbolo.put("r",true);
+		tiposDeSimbolo.put("W",false);
+		tiposDeSimbolo.put("1",true);
 		
-		gG.addProducao(new Producao(_a, new ArrayList<Token>(Arrays.asList(_a, y))));
-		gG.addProducao(new Producao(_a, new ArrayList<Token>(Arrays.asList(k))));
-		gG.addProducao(new Producao(_a, new ArrayList<Token>(Arrays.asList(_a, x))));
-		gG.addProducao(new Producao(_a, new ArrayList<Token>(Arrays.asList(m, _w))));
-		gG.addProducao(new Producao(_w, new ArrayList<Token>(Arrays.asList(r))));
-		gG.addProducao(new Producao(_w, new ArrayList<Token>(Arrays.asList(k))));
-		gG.addProducao(new Producao(_w, new ArrayList<Token>(Arrays.asList(_1))));
-		gG.addProducao(new Producao(_w, new ArrayList<Token>(Arrays.asList(y))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "y"))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("k"))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "x"))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("m", "W"))));
+		
+		//esses dois nao existem no exemplo
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("W","y"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("A","y"))));
+		
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("r"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("k"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("1"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("y"))));
 		//ArrayList<String> places = new ArrayList<String>(Arrays.asList("Buenos Aires", "Córdoba", "La Plata"));
-		HashMap<Token, ArrayList<Token>> first = gG.first();
+		HashMap<String, ArrayList<String>> first = gG.first();
 		System.out.println(first);
-		for (HashMap.Entry<Token, ArrayList<Token>> e : first.entrySet()) {
+		for (HashMap.Entry<String, ArrayList<String>> e : first.entrySet()) {
 			System.out.println(e.getValue());
 		}
+		System.out.println(gG.primeiraRegra(true));
+		
+		gG.listaRegras();
+		
 	}
 }
