@@ -81,27 +81,76 @@ public class Gramatica {
 		}
 		
 		//teste de recursão à esquerda indireta
-		numRegra = 0;
-		boolean[] regraVisitada = new boolean[producoes.size()];
-		for(int i = 0; i < regraVisitada.length; i++)
-			regraVisitada[i] = false;
+
 		for (String s : getNaoTerminais()) {
+			boolean[] regraVisitada = new boolean[producoes.size()];
+			for(int i = 0; i < regraVisitada.length; i++)
+				regraVisitada[i] = false;
+			int qtNaoVisitadas = producoes.size();
+			
+			//vetor que diz como fazer o backtrack para procurar recursões novamente no
+			//"nó" anterior
+			int[] regraAncestral = new int[producoes.size()];
+			for(int i = 0; i < regraAncestral.length; i++)
+				regraAncestral[i] = -1;
+			
 			//System.out.println("1"+s);
 			ArrayList<String> naoTerminaisVisitados = new ArrayList<String>();
-			for (int i = 0; i < producoes.size(); i++) {
+			int i = 0;
+			while (qtNaoVisitadas > 0) {
 				Producao p = producoes.get(i);
-				if (!ehTerminal(p.getDireita().get(0)) && !p.getEsquerda().equals(p.getDireita().get(0))) {
-					//essa regra começa com um símbolo não-terminal T, devemos investigar
-					//procurando loops dentro das regras que partem de T
-					String t = p.getDireita().get(0);
-					for (int j = 0; j < producoes.size(); j++) {
-						if()
+				//System.out.println("estou na regra " + i +", " +p );
+				if(!regraVisitada[i]) {
+					if (!ehTerminal(p.getDireita().get(0)) && !p.getEsquerda().equals(p.getDireita().get(0))) {
+						if(s.equals(p.getDireita().get(0)) && jaMeVisitei(s, naoTerminaisVisitados)) {
+							System.out.println("existe recursão à direita terminando na regra " + i + ": " + s + " -> * -> " + p);
+							atende = false;
+							break;
+						} else {
+							//essa regra começa com um símbolo não-terminal T, devemos investigar
+							//procurando loops dentro das regras que partem de T
+							String t = p.getDireita().get(0);
+							boolean acheiT = false;
+							for(int j = 0; j < producoes.size(); j++) {
+								
+								Producao q = producoes.get(j);
+								if(q.getEsquerda().equals(t) && regraVisitada[j] == false) {
+									//achamos uma produção que parte de símbolo não-terminal T
+									regraAncestral[j] = i;
+									naoTerminaisVisitados.add(p.getEsquerda());
+									i = j;
+									acheiT = true;
+									break;
+								}
+							}
+							if (!acheiT) {
+								regraVisitada[i] = true;
+								qtNaoVisitadas--;
+								if (regraAncestral[i] == -1) {
+									//não achei uma produção para seguir nem posso voltar atrás,
+									//então não deve haver recursão indireta
+									break;
+								} else {
+									//voltaremos atrás, ao símbolo que tinha a produção que levava a T
+									i = regraAncestral[i];
+									naoTerminaisVisitados.remove(naoTerminaisVisitados.size());
+								}
+							}
+							
+							System.out.println(i + ": " + p + "hufdshfa");
+						}
+					} else {
+						//saímos de uma sequência de não-terminais, vamos seguir adiante
+						regraVisitada[i] = true;
+						qtNaoVisitadas--;
+						i = (i+1) % producoes.size();
 					}
-					//descer(t, naoTerminaisVisitados);
-					//Function<T, R>
-					System.out.println(p + "hufdshfa");
 				} else {
+					//estamos numa regra que já foi visitada, vamos seguir adiante, dando a volta
+					//para começar a procurar na regra 0 se necessário
 					regraVisitada[i] = true;
+					qtNaoVisitadas--;
+					i = (i+1) % producoes.size();
 				}
 			}
 		}
@@ -110,7 +159,12 @@ public class Gramatica {
 		return atende;
 	}
 	
-	
+	public boolean jaMeVisitei(String procurada, ArrayList<String> lista) {
+		for (String string : lista)
+			if( string.equals(procurada))
+				return true;
+		return false;
+	}
 
 	private ArrayList<String> getNaoTerminais() {
 		ArrayList<String> resultado = new ArrayList<String>();
