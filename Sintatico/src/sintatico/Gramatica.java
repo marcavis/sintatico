@@ -38,7 +38,7 @@ public class Gramatica {
 		return producoes;
 	}
 	
-	//retorna um dicionário associando símbolos ao 
+	//retorna um dicionário associando símbolos ao primeiro símbolo  
 	public HashMap<String, ArrayList<String>> first() {
 		Function<String, ArrayList<String>> achaFirstNT = (String simb) -> {
 			for (Producao p : producoes) {
@@ -47,7 +47,8 @@ public class Gramatica {
 					//ao first do simbolo atual
 				}
 			}
-		}
+			return null;
+		};
 		
 		if(!primeiraRegra()) {
 			System.out.println("Impossível criar first, gramática não é determinística");
