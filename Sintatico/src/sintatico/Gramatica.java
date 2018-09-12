@@ -6,14 +6,22 @@ import java.util.function.Function;
 
 public class Gramatica {
 	private ArrayList<Producao> producoes;
+	private String inicial;
 	private int[][] parsing;
 	private HashMap<String, Boolean> tiposDeSimbolo;
 	
-	public Gramatica() {
+	public Gramatica(String inicial) {
+		this.inicial = inicial;
 		producoes = new ArrayList<Producao>();
 		tiposDeSimbolo = new HashMap<String, Boolean>();
 	}
 	
+	//retorna o símbolo inicial da gramática
+	public String getInicial() {
+		return inicial;
+	}
+	
+	//dicionário que liga símbolos ao tipo (terminal ou não)
 	public HashMap<String, Boolean> getTiposDeSimbolo() {
 		return tiposDeSimbolo;
 	}
@@ -30,32 +38,76 @@ public class Gramatica {
 		return producoes;
 	}
 	
+	//retorna um dicionário associando símbolos ao 
 	public HashMap<String, ArrayList<String>> first() {
-		HashMap<String, ArrayList<String>> resultado = new HashMap<String, ArrayList<String>>();
-		for (Producao p : producoes) {
-			if (resultado.containsKey(p.getEsquerda())) {
-				//perigoso, isso altera o objeto original
-				//ArrayList<String> novoFirst = resultado.get(p.getEsquerda());
-				ArrayList<String> novoFirst = new ArrayList<String>();
-				for (String s : resultado.get(p.getEsquerda())) {
-					novoFirst.add(s);
-				}
-				
-				String novoItem = p.getDireita().get(0);
-				boolean jaExiste = false;
-				for (String s : novoFirst) {
-					if (novoItem.equals(s))
-						jaExiste = true;
-				}
-				//apenas adicionar ao First símbolos que não foram adicionados ainda
-				if(!jaExiste) {
-					novoFirst.add(p.getDireita().get(0));
-					resultado.put(p.getEsquerda(), novoFirst);
+		Function<String, ArrayList<String>> achaFirstNT = (String simb) -> {
+			for (Producao p : producoes) {
+				if (p.getEsquerda().equals(simb)) {
+					//TODO: fazer de modo recursivo com que os firsts de outros NTs sejam adicionados
+					//ao first do simbolo atual
 				}
 			}
-			else
-				resultado.put(p.getEsquerda(), p.getDireita());
 		}
+		
+		if(!primeiraRegra()) {
+			System.out.println("Impossível criar first, gramática não é determinística");
+			return null;
+		}
+			
+		//TODO: alterar para preencher por simbolo, e não por produção
+		
+		HashMap<String, ArrayList<String>> resultado = new HashMap<String, ArrayList<String>>();
+		//preencher os firsts dos símbolos terminais
+		for (String simb : tiposDeSimbolo.keySet()) {
+			//se for terminal, adicione o first
+			if(tiposDeSimbolo.get(simb))  {
+				ArrayList<String> novoFirst = new ArrayList<String>();
+				novoFirst.add(simb);
+				resultado.put(simb, novoFirst);
+			} else {
+				for (Producao p : producoes) {
+					if (p.getEsquerda().equals(simb)) {
+						
+					}
+				}
+			}
+		}
+		
+		//preencher os firsts dos símbolos não-terminais
+//		for (Producao p : producoes) {
+//			if (resultado.containsKey(p.getEsquerda())) {
+//				//perigoso, isso altera o objeto original
+//				//ArrayList<String> novoFirst = resultado.get(p.getEsquerda());
+//				ArrayList<String> novoFirst = new ArrayList<String>();
+//				for (String s : resultado.get(p.getEsquerda())) {
+//					novoFirst.add(s);
+//				}
+//				
+//				String novoItem = p.getDireita().get(0);
+//				boolean jaExiste = false;
+//				for (String s : novoFirst) {
+//					if (novoItem.equals(s))
+//						jaExiste = true;
+//				}
+//				//apenas adicionar ao First símbolos que não foram adicionados ainda
+//				if(!jaExiste) {
+//					novoFirst.add(p.getDireita().get(0));
+//					resultado.put(p.getEsquerda(), novoFirst);
+//				}
+//			}
+//			else
+//				resultado.put(p.getEsquerda(), resultado.get(p.getDireita().get(0)));
+//		}
+		
+		
+		return resultado;
+	}
+	
+	public HashMap<String, ArrayList<String>> follow() {
+		HashMap<String, ArrayList<String>> resultado = new HashMap<String, ArrayList<String>>();
+		resultado.get(getInicial()).add("$");
+		
+		
 		return resultado;
 	}
 	
@@ -77,7 +129,6 @@ public class Gramatica {
 					System.out.println("Regra " + numRegra + " com recursão à esquerda direta: " + p);
 				}
 			}
-			
 		}
 		
 		//teste de recursão à esquerda indireta
@@ -103,7 +154,8 @@ public class Gramatica {
 				if(!regraVisitada[i]) {
 					if (!ehTerminal(p.getDireita().get(0)) && !p.getEsquerda().equals(p.getDireita().get(0))) {
 						if(s.equals(p.getDireita().get(0)) && jaMeVisitei(s, naoTerminaisVisitados)) {
-							System.out.println("existe recursão à direita terminando na regra " + i + ": " + s + " -> * -> " + p);
+							if (mostraErro)
+								System.out.println("existe recursão à direita terminando na regra " + i + ": " + s + " -> * -> " + p);
 							atende = false;
 							break;
 						} else {
@@ -136,8 +188,6 @@ public class Gramatica {
 									naoTerminaisVisitados.remove(naoTerminaisVisitados.size());
 								}
 							}
-							
-							System.out.println(i + ": " + p + "hufdshfa");
 						}
 					} else {
 						//saímos de uma sequência de não-terminais, vamos seguir adiante
@@ -154,7 +204,6 @@ public class Gramatica {
 				}
 			}
 		}
-		
 		
 		return atende;
 	}
