@@ -7,10 +7,16 @@ import java.util.HashMap;
 public class Sintatico {
 	public static void main(String[] args) {
 		importarConstantesLingSimples(); //exemplo do arquivo gals no EVA
-		exercicio1G1();
+		//exercicio1G1();
+		String codigoFonte = importarCodigoFonte();
 		
 	}
 	
+	private static String importarCodigoFonte() {
+		// TODO Auto-generated method stub
+		return "prog begin read ( foo ) ; end.";
+	}
+
 	public static void exercicio1G1() {
 		Gramatica gG = new Gramatica("A");
 		HashMap<String, Boolean> tiposDeSimbolo = gG.getTiposDeSimbolo();
@@ -49,6 +55,8 @@ public class Sintatico {
 		
 	}
 	
+	
+	
 	public static void importarConstantesLingSimples() {
 	    int EPSILON  = 0;
 	    int DOLLAR   = 1;
@@ -70,22 +78,25 @@ public class Sintatico {
 	    int FIRST_NON_TERMINAL    = 13;
 	    int FIRST_SEMANTIC_ACTION = 17;
 
+	    //
+	    
 	    int[][] PARSER_TABLE =
 	    {
-	        { -1, -1, -1, -1, -1, -1, -1,  0, -1, -1, -1, -1 },
-	        { -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1 },
-	        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  2,  3 },
-	        { -1, -1, -1, -1, -1, -1, -1, -1, -1,  5,  4,  4 }
+	    	// $  (   )   ;   .   id num prog bgn end rd  wrt	
+	        { -1, -1, -1, -1, -1, -1, -1,  0, -1, -1, -1, -1 }, //inicio
+	        { -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1 }, //bloco
+	        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  2,  3 }, //cmd
+	        { -1, -1, -1, -1, -1, -1, -1, -1, -1,  5,  4,  4 }  //repcmd
 	    };
 
 	    int[][] PRODUCTIONS = 
 	    {
-	        {  8, 14,  5 },
-	        {  9, 15, 10 },
-	        { 11,  2,  6,  3,  4, 16 },
-	        { 12,  2,  6,  3,  4, 16 },
-	        { 15, 11 },
-	        {  0 }
+	        {  8, 14,  5 },				// prog <bloco> .
+	        {  9, 15, 10 },				// begin <cmd> end
+	        { 11,  2,  6,  3,  4, 16 },	// read ( id ) ; <repcmd>
+	        { 12,  2,  6,  3,  4, 16 },	// write ( id ) ; <repcmd>
+	        { 15, 11 },					// cmd read (estranho)
+	        {  0 }						// epsilon
 	    };
 
 	    String[] PARSER_ERROR =
