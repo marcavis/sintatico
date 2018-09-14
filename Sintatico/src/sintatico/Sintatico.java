@@ -6,59 +6,7 @@ import java.util.HashMap;
 
 public class Sintatico {
 	public static void main(String[] args) {
-		importarConstantesLingSimples(); //exemplo do arquivo gals no EVA
-		//exercicio1G1();
-		String codigoFonte = importarCodigoFonte();
-		
-	}
-	
-	private static String importarCodigoFonte() {
-		// TODO Auto-generated method stub
-		return "prog begin read ( foo ) ; end.";
-	}
-
-	public static void exercicio1G1() {
-		Gramatica gG = new Gramatica("A");
-		HashMap<String, Boolean> tiposDeSimbolo = gG.getTiposDeSimbolo();
-		tiposDeSimbolo.put("A", false); //A é um token não-terminal
-		tiposDeSimbolo.put("q",true);
-		tiposDeSimbolo.put("y",true);
-		tiposDeSimbolo.put("k",true);
-		tiposDeSimbolo.put("x",true);
-		tiposDeSimbolo.put("m",true);
-		tiposDeSimbolo.put("r",true);
-		tiposDeSimbolo.put("W",false);
-		tiposDeSimbolo.put("1",true);
-		
-		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "y"))));
-		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("k"))));
-		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "x"))));
-		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("m", "W"))));
-		
-		//esses dois nao existem no exemplo
-		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("W","y"))));
-		//gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("A","y"))));
-		
-		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("r"))));
-		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("k"))));
-		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("1"))));
-		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("y"))));
-		//ArrayList<String> places = new ArrayList<String>(Arrays.asList("Buenos Aires", "Córdoba", "La Plata"));
-		HashMap<String, ArrayList<String>> first = gG.first();
-		
-		System.out.println("first:");
-		System.out.println(first);
-		
-		System.out.println(gG.primeiraRegra(true));
-		
-		gG.listaRegras();
-		
-	}
-	
-	
-	
-	public static void importarConstantesLingSimples() {
-	    int EPSILON  = 0;
+		int EPSILON  = 0;
 	    int DOLLAR   = 1;
 
 	    int t_TOKEN_2 = 2; //"("
@@ -119,5 +67,76 @@ public class Sintatico {
 	        "<CMD> inválido",
 	        "<REPCMD> inválido"
 	    };
+		
+	    
+		//acima =  exemplo do arquivo gals no EVA
+		
+	    //exercicio1G1();
+		String codigoFonte = importarCodigoFonte();
+		char[] fonte = new char[codigoFonte.length()];
+		
+		for (int i = 0; i < codigoFonte.length(); i++) {
+			fonte[i] = codigoFonte.charAt(i);
+		}
+		Lexico lex = new Lexico(fonte);
+		
+		PilhaDinamica<Integer> simbolos = new PilhaDinamica<Integer>();
+		simbolos.inserir(START_SYMBOL);
+		{
+			int atual = simbolos.retirar();
+			//se símbolo atual da pilha é terminal:
+			if(atual < FIRST_NON_TERMINAL) {
+				if(atual == lex.proxToken()) {
+					
+				}
+			}
+			
+		}
 	}
+	
+	private static String importarCodigoFonte() {
+		// TODO Auto-generated method stub
+		return "prog begin read ( foo ) ; end.";
+	}
+
+	public static void exercicio1G1() {
+		Gramatica gG = new Gramatica("A");
+		HashMap<String, Boolean> tiposDeSimbolo = gG.getTiposDeSimbolo();
+		tiposDeSimbolo.put("A", false); //A é um token não-terminal
+		tiposDeSimbolo.put("q",true);
+		tiposDeSimbolo.put("y",true);
+		tiposDeSimbolo.put("k",true);
+		tiposDeSimbolo.put("x",true);
+		tiposDeSimbolo.put("m",true);
+		tiposDeSimbolo.put("r",true);
+		tiposDeSimbolo.put("W",false);
+		tiposDeSimbolo.put("1",true);
+		
+		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "y"))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("k"))));
+		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("A", "x"))));
+		gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("m", "W"))));
+		
+		//esses dois nao existem no exemplo
+		//gG.addProducao(new Producao("A", new ArrayList<String>(Arrays.asList("W","y"))));
+		//gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("A","y"))));
+		
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("r"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("k"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("1"))));
+		gG.addProducao(new Producao("W", new ArrayList<String>(Arrays.asList("y"))));
+		//ArrayList<String> places = new ArrayList<String>(Arrays.asList("Buenos Aires", "Córdoba", "La Plata"));
+		HashMap<String, ArrayList<String>> first = gG.first();
+		
+		System.out.println("first:");
+		System.out.println(first);
+		
+		System.out.println(gG.primeiraRegra(true));
+		
+		gG.listaRegras();
+		
+	}
+	
+	
+
 }
