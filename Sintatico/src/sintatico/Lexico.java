@@ -13,7 +13,13 @@ public class Lexico {
 	final int ENEUTRO = 0;
 	final int EID = 1;
 	final int ENUMERO = 2;
+	final int ECOLON = 5;
+	final int EMENOR = 6;
+	final int EMAIOR = 7;
 	final int ELITERAL = 8;
+	final int ELPAREN = 9;
+	final int ECOMENT = 15;
+	final int EFIMCOMENT = 16;
 
 
 	//tabela de tokens
@@ -80,54 +86,170 @@ public class Lexico {
 	
 	public int proxToken() throws Exception {
 		esteToken = "";
-		{ //um do-while aqui?
-		char atual = fonte[posicao];
-		
-		
-		//provavelmente colocar as estruturas abaixo dentro de um while(true)
-		// que retornam um código quando completam um token com sucesso (ou não)
-		switch (estado) {
-		case ENEUTRO:
-			if(Character.isWhitespace(atual)) {
-				linha++;
-			} else if (Character.isLetter(atual)) {
-				estado = EID;
-				esteToken += atual;
-			} else if (Character.isDigit(atual)) {
-				estado = ENUMERO;
-				esteToken += atual;
+		do { //um do-while aqui?
+			char atual = fonte[posicao];
+			
+			//provavelmente colocar as estruturas abaixo dentro de um while(true)
+			// que retornam um código quando completam um token com sucesso (ou não)
+			switch (estado) {
+			case ENEUTRO:
+				if(Character.isWhitespace(atual)) {
+					//basicamente ignorar espaços, exceto \n, que incrementa o contador de linhas
+					if(atual == '\n') {
+						linha++;
+					}
+					
+				} else if (Character.isLetter(atual)) {
+					estado = EID;
+					esteToken += atual;
+				} else if (Character.isDigit(atual)) {
+					estado = ENUMERO;
+					esteToken += atual;
+				} else if (atual == '"') {
+					estado = ELITERAL;
+					esteToken += atual;
+				} else if (atual == '(') {
+					estado = ELPAREN;
+				} else if (atual == ')') {
+					estado = ENEUTRO;
+					posicao++;
+					return RPAREN;
+				} else if (atual == '(') {
+					estado = ELPAREN;
+				} else if (atual == '+') {
+					estado = ENEUTRO;
+					posicao++;
+					return PLUS;
+				} else if (atual == '-') {
+					estado = ENEUTRO;
+					posicao++;
+					return MINUS;
+				} else if (atual == '*') {
+					estado = ENEUTRO;
+					posicao++;
+					return ASTERISK;
+				} else if (atual == '/') {
+					estado = ENEUTRO;
+					posicao++;
+					return SLASH;
+				} else if (atual == '=') {
+					estado = ENEUTRO;
+					posicao++;
+					return EQUALS;
+				} else if (atual == '>') {
+					estado = EMAIOR;
+				} else if (atual == '<') {
+					estado = EMENOR;
+				} else if (atual == ':') {
+					estado = ECOLON;
+				} else if (atual == ';') {
+					estado = ENEUTRO;
+					posicao++;
+					return SEMICOLON;
+				} else if (atual == ',') {
+					estado = ENEUTRO;
+					posicao++;
+					return COMMA;
+				} else if (atual == '.') {
+					estado = ENEUTRO;
+					posicao++;
+					return PERIOD;
+				} 
+				break;
+			case EID:
+				if(Character.isLetter(atual) || Character.isDigit(atual)) {
+					esteToken += atual;
+					//estado = ID;
+				} else {
+					//acabou o identificador, voltar ao estado neutro sem avançar na leitura de
+					//caracteres do código-fonte.
+					estado = ENEUTRO;
+					return tratarIdentificador(esteToken);
+				}
+				break;
+			case ENUMERO:
+				if(Character.isDigit(atual)) {
+					esteToken += atual;
+				} else if(Character.isLetter(atual)) {
+					throw new Exception("Linha " + linha + ": Caractere inesperado '" 
+							+ atual + "' quando da leitura de um número");
+				} else {
+					estado = ENEUTRO;
+					return tratarNumero(esteToken);
+				}
+				break;
+			case ECOLON:
+				if(atual == '=') {
+					estado = ENEUTRO;
+					posicao++;
+					return ATTRIBUTION;
+				} else {
+					estado = ENEUTRO;
+					return COLON;
+				}
+			case EMENOR:
+				if(atual == '=') {
+					estado = ENEUTRO;
+					posicao++;
+					return LE;
+				} else if(atual == '>') {
+					estado = ENEUTRO;
+					posicao++;
+					return DIFFERENT;
+				} else {
+					//foi encontrado apenas '<', não seguir adiante e devolver o 
+					//estado para o padrão
+					estado = ENEUTRO;
+					return LT;
+				}
+				//break;
+			case EMAIOR:
+				if(atual == '=') {
+					estado = ENEUTRO;
+					posicao++;
+					return GE;
+				} else {
+					//foi encontrado apenas '>', não seguir adiante e devolver o 
+					//estado para o padrão
+					estado = ENEUTRO;
+					return GT;
+				}
+				//break;
+			case ELITERAL:
+				if(atual == '"') {
+					estado = ENEUTRO;
+					posicao++;
+					return tratarLiteral(esteToken);
+				} else {
+					esteToken += atual;
+				}
+				break;
+			case ELPAREN:
+				if(atual == '*') {
+					estado = ECOMENT;
+				} else {
+					estado = ENEUTRO;
+					return LPAREN;
+				}
+				break;
+				//os estados ECOMENT e EFIMCOMENT praticamente não fazem nada, apenas
+				//fazem o processamento necessário para que termine o comentário
+			case ECOMENT:
+				if(atual == '*') {
+					estado = EFIMCOMENT;
+				}
+				break;
+			case EFIMCOMENT:
+				if(atual == ')') {
+					estado = ENEUTRO;
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case EID:
-			if(Character.isLetter(atual) || Character.isDigit(atual)) {
-				esteToken += atual;
-				//estado = ID;
-			} else {
-				//acabou o identificador, voltar ao estado neutro sem avançar na leitura de
-				//caracteres do código-fonte; como a posição será avançada
-				//depois do fim do switch, fazemos ela retroceder neste ponto.
-				estado = ENEUTRO;
-				posicao--;
-				return tratarIdentificador(esteToken);
-			}
-			break;
-		case ENUMERO:
-			if(Character.isDigit(atual)) {
-				esteToken += atual;
-			} else if(Character.isLetter(atual)) {
-				throw new Exception("Linha " + linha + ": Caractere inesperado '" 
-						+ atual + "' quando da leitura de um número");
-			} else {
-				estado = ENEUTRO;
-				posicao--;
-				return tratarNumero(esteToken);
-			}
-		default:
-			break;
-		}
-		posicao++;
-		}
-		return 0;
+			posicao++;
+		} while(true);
+		//return 0;
 	}
 	
 //	public boolean ehLetra(char c) {
@@ -145,7 +267,7 @@ public class Lexico {
 	
 	public int tratarIdentificador(String token) throws Exception {
 		if(token.length() > 30) {
-			throw new Exception("Linha " + linha + ": Identificador inválido '" 
+			throw new Exception("Linha " + linha + ": Identificador inválido: '" 
 					+ token + "' tem mais de 30 caracteres");
 		}
 		for(int i = 0; i < reservadas.length; i++) {
@@ -154,6 +276,23 @@ public class Lexico {
 				return PRIMEIRA_RESERVADA + i;
 			}
 		}
-		return 19; //código de token do tipo ID
+		return ID; //código de token do tipo ID
+	}
+	
+	public int tratarNumero(String token) throws Exception {
+		int numero = Integer.parseInt(token);
+		if(token.length() > 5 || numero > 32767 | numero < 32767) {
+			throw new Exception("Linha " + linha + ": Número inválido: '" 
+					+ token + "' não está entre -32767 e 32767.");
+		}
+		return INTEIRO;
+	}
+	
+	public int tratarLiteral(String token) throws Exception {
+		if(token.length() > 255) {
+			throw new Exception("Linha " + linha + ": Literal inválido: '" 
+					+ token + "' tem mais de 255 caracteres");
+		}
+		return LIT; //código de token do tipo ID
 	}
 }
