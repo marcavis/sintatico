@@ -25,26 +25,29 @@ public class Lexico {
 	//tabela de tokens
 	int EPSILON = 0;
 	int DOLLAR = 1;
-	int PLUS = 2;
-	int MINUS = 3;
-	int ASTERISK = 4;
-	int SLASH = 5;
-	int EQUALS = 6;
-	int GT = 7;
-	int GE = 8;
-	int LT = 9;
-	int LE = 10;
-	int DIFFERENT = 11;
-	int ATTRIBUTION = 12;
-	int COLON = 13;
-	int SEMICOLON = 14;
-	int COMMA = 15;
-	int PERIOD = 16;
-	int LPAREN = 17;
-	int RPAREN = 18;
+
+	
+	
+	int LPAREN = 2; //"("
+	int RPAREN = 3; //")"
+	int COMMA = 4; //","
+	int SEMICOLON = 5; //";"
+	int PERIOD = 6; //"."
+	int COLON = 7; //":"
+	int ATTRIBUTION = 8; //":="
+	int EQUALS = 9; //"="
+	int LT = 10; //"<"
+	int GT = 11; //">"
+	int GE = 12; //">="
+	int LE = 13; //"<="
+	int DIFFERENT = 14; //"<>"
+	int PLUS = 15; //"+"
+	int MINUS = 16; //"-"
+	int ASTERISK = 17; //"*"
+	int SLASH = 18; //"/"
 	int ID = 19;
 	int INTEIRO = 20;
-	int LIT = 21;
+	int LITERAL = 21;
 	int PROGRAM = 22;
 	int CONST = 23;
 	int VAR = 24;
@@ -52,35 +55,35 @@ public class Lexico {
 	int BEGIN = 26;
 	int END = 27;
 	int INTEGER = 28;
-	int OF = 29;
-	int CALL = 30;
-	int IF = 31;
-	int THEN = 32;
-	int ELSE = 33;
-	int WHILE = 34;
-	int DO = 35;
-	int REPEAT = 36;
-	int UNTIL = 37;
-	int READLN = 38;
-	int WRITELN = 39;
-	int OR = 40;
-	int AND = 41;
-	int NOT = 42;
-	int FOR = 43;
-	int TO = 44;
-	int CASE = 45;
+	int CALL = 29;
+	int IF = 30;
+	int THEN = 31;
+	int ELSE = 32;
+	int WHILE = 33;
+	int DO = 34;
+	int REPEAT = 35;
+	int UNTIL = 36;
+	int READLN = 37;
+	int WRITELN = 38;
+	int OR = 39;
+	int AND = 40;
+	int NOT = 41;
+	int FOR = 42;
+	int TO = 43;
+	int CASE = 44;
+	int OF = 45;
 	final private int PRIMEIRA_RESERVADA = 22; //PROGRAM
 	final private String[] reservadas = new String[] {
 			"PROGRAM", "CONST", "VAR", "PROCEDURE", "BEGIN", "END",
-			"INTEGER", "OF", "CALL", "IF", "THEN", "ELSE", "WHILE", "DO",
+			"INTEGER", "CALL", "IF", "THEN", "ELSE", "WHILE", "DO",
 			"REPEAT", "UNTIL", "READLN", "WRITELN", "OR", "AND", "NOT",
-			"FOR", "TO", "CASE"
+			"FOR", "TO", "CASE", "OF"
 	};
 	
 	public Lexico(char[] fonte) {
 		this.fonte = fonte;
 		this.posicao = 0;
-		this.linha = 0; //TODO: implementar mudança de linha nos \n
+		this.linha = 0; 
 		this.esteToken = "";
 	}
 	
@@ -293,6 +296,6 @@ public class Lexico {
 			throw new Exception("Linha " + linha + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
-		return LIT; //código de token do tipo ID
+		return LITERAL; //código de token do tipo ID
 	}
 }
