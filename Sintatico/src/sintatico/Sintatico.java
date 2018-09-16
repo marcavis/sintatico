@@ -86,8 +86,13 @@ public class Sintatico {
 			int atual = simbolos.retirar();
 			//se símbolo atual da pilha é terminal:
 			if(atual < FIRST_NON_TERMINAL) {
-				if(atual == lex.proxToken()) {
-					
+				try {
+					if(atual == lex.proxToken()) {
+						
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 			
