@@ -6,8 +6,10 @@ public class Lexico {
 	private char[] fonte;
 	private int linha;
 	private int posicao;
+	private int posicaoAnterior;
 	private int estado;
 	private String esteToken;
+	private String ultimoLexema;
 	
 	//estados possíveis:
 	final int ENEUTRO = 0;
@@ -21,13 +23,9 @@ public class Lexico {
 	final int ECOMENT = 15;
 	final int EFIMCOMENT = 16;
 
-
 	//tabela de tokens
 	int EPSILON = 0;
 	int DOLLAR = 1;
-
-	
-	
 	int LPAREN = 2; //"("
 	int RPAREN = 3; //")"
 	int COMMA = 4; //","
@@ -87,10 +85,28 @@ public class Lexico {
 		this.esteToken = "";
 	}
 	
+	public int getLinha() {
+		return linha;
+	}
+	
+	public int getPosicao() {
+		return posicao;
+	}
+	
+	public String getUltimoLexema() {
+		return ultimoLexema;
+	}
+
 	public int proxToken() throws Exception {
+		posicaoAnterior = posicao;
 		esteToken = "";
 		do { //um do-while aqui?
-			char atual = fonte[posicao];
+			char atual = ' ';
+			try {
+				atual = fonte[posicao];
+			} catch (Exception e) {
+				throw new Exception("");
+			}
 			
 			//provavelmente colocar as estruturas abaixo dentro de um while(true)
 			// que retornam um código quando completam um token com sucesso (ou não)
@@ -279,6 +295,7 @@ public class Lexico {
 				return PRIMEIRA_RESERVADA + i;
 			}
 		}
+		ultimoLexema = token;
 		return ID; //código de token do tipo ID
 	}
 	
@@ -288,6 +305,7 @@ public class Lexico {
 			throw new Exception("Linha " + linha + ": Número inválido: '" 
 					+ token + "' não está entre -32767 e 32767.");
 		}
+		ultimoLexema = token;
 		return INTEIRO;
 	}
 	
@@ -296,6 +314,11 @@ public class Lexico {
 			throw new Exception("Linha " + linha + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
+		ultimoLexema = token;
 		return LITERAL; //código de token do tipo ID
+	}
+	
+	public void retorna() {
+		posicao = posicaoAnterior;
 	}
 }

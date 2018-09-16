@@ -38,7 +38,7 @@ public class PilhaDinamica<T> {
 		String resp = "[";
 		Node<T> mostra = topo;
 		while (mostra.next != null) {
-			resp += mostra.valor + ",";
+			resp += mostra.valor + ", ";
 			mostra = mostra.next;
 		}
 		resp += mostra.valor;
