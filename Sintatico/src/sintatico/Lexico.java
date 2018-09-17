@@ -84,6 +84,7 @@ public class Lexico {
 		this.esteToken = "";
 	}
 	
+	//conta a quantidade de linhas passada até o momento
 	public int getLinha() {
 		int linha = 0;
 		for(int i = 0; i < posicao; i++) {
@@ -98,14 +99,16 @@ public class Lexico {
 		return posicao;
 	}
 	
+	//retorna qual foi o último identificador, número ou literal identificado
 	public String getUltimoLexema() {
 		return ultimoLexema;
 	}
 
+	//função que, partindo da posição do cursor (variável "posicao" dentro do arquivo), captura o token seguinte
 	public int proxToken() throws Exception {
 		posicaoAnterior = posicao;
 		esteToken = "";
-		do { //um do-while aqui?
+		do {
 			char atual = ' ';
 			try {
 				atual = fonte[posicao];
@@ -113,8 +116,7 @@ public class Lexico {
 				throw e;
 			}
 			
-			//provavelmente colocar as estruturas abaixo dentro de um while(true)
-			// que retornam um código quando completam um token com sucesso (ou não)
+			//implementação de algo parecido com um autômato para o léxico
 			switch (estado) {
 			case ENEUTRO:
 				if(Character.isWhitespace(atual)) {
@@ -175,21 +177,25 @@ public class Lexico {
 					estado = ENEUTRO;
 					posicao++;
 					return PERIOD;
-				} 
+				} else {
+					throw new InvalidTokenException("Linha " + getLinha() + ": Caractere \"" + atual + "\" inválido encontrado.");
+				}
 				break;
 			case EID:
+				//já estamos dentro de um identificador, portanto o segundo caractere em diante também
+				//pode ser um número
 				if(Character.isLetter(atual) || Character.isDigit(atual)) {
 					esteToken += atual;
-					//estado = ID;
 				} else {
 					//acabou o identificador, voltar ao estado neutro sem avançar na leitura de
 					//caracteres do código-fonte.
 					estado = ENEUTRO;
-					//System.out.println(esteToken);
 					return tratarIdentificador(esteToken);
 				}
 				break;
 			case ENUMERO:
+				//estamos dentro de um número - um número seguido de uma letra é sempre um erro,
+				//mas em outros casos devolve-se a decisão para o estado neutro do autômato
 				if(Character.isDigit(atual)) {
 					esteToken += atual;
 				} else if(Character.isLetter(atual)) {
@@ -272,12 +278,7 @@ public class Lexico {
 			}
 			posicao++;
 		} while(true);
-		//return 0;
 	}
-	
-//	public boolean ehLetra(char c) {
-		
-//	}
 	
 	//retorna se o número x está incluído num conjunto de números 
 	public boolean contido(int x, int[] conjunto) {
@@ -288,9 +289,11 @@ public class Lexico {
 		return resposta;
 	}
 	
+	//se for um identificador válido retorna o código de identificador normal
+	//ou o código de alguma palavra reservada específica
 	public int tratarIdentificador(String token) throws Exception {
 		if(token.length() > 30) {
-			throw new Exception("Linha " + getLinha() + ": Identificador inválido: '" 
+			throw new InvalidTokenException("Linha " + getLinha() + ": Identificador inválido: '" 
 					+ token + "' tem mais de 30 caracteres");
 		}
 		for(int i = 0; i < reservadas.length; i++) {
@@ -303,29 +306,33 @@ public class Lexico {
 		return ID; //código de token do tipo ID
 	}
 	
+	//retorna o código de token de número inteiro, se for um número permitido pela linguagem
 	public int tratarNumero(String token) throws Exception {
 		int numero = Integer.parseInt(token);
 		if(numero > 32767 || numero < -32767) {
-			throw new Exception("Linha " + getLinha() + ": Número inválido: '" 
+			throw new InvalidTokenException("Linha " + getLinha() + ": Número inválido: '" 
 					+ token + "' não está entre -32767 e 32767.");
 		}
 		ultimoLexema = token;
 		return INTEIRO;
 	}
 	
+	//retorna o código de token de literal ("string"), se for um literal válido
 	public int tratarLiteral(String token) throws Exception {
 		if(token.length() > 255) {
-			throw new Exception("Linha " + getLinha() + ": Literal inválido: '" 
+			throw new InvalidTokenException("Linha " + getLinha() + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
 		ultimoLexema = token;
 		return LITERAL; //código de token do tipo ID
 	}
 	
+	//retrocede na leitura do código fonte para que um token possa ser lido novamente
 	public void retorna() {
 		posicao = posicaoAnterior;
 	}
 	
+	//informa se chegamos no fim do código fonte
 	public boolean semTokens() {
 		return posicao >= fonte.length;
 	}

@@ -1,19 +1,10 @@
 package sintatico;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.function.DoubleToLongFunction;
-
 public class Sintatico {
 	public static void main(String[] args) {
 		int EPSILON = 0;
 		int DOLLAR = 1;
 	    int START_SYMBOL = 46;
-
-//	    String[] LEGENDA = {
-//	    		
-//	    };
 	    
 	    int FIRST_NON_TERMINAL    = 46;
 	    int FIRST_SEMANTIC_ACTION = 77;
@@ -182,7 +173,9 @@ public class Sintatico {
 		PilhaDinamica<Integer> simbolos = new PilhaDinamica<Integer>();
 		simbolos.inserir(DOLLAR);
 		simbolos.inserir(START_SYMBOL);
+		//repetir o algoritmo descendente preditivo até que acabe a leitura do código fonte
 		do {
+			//DEBUG: mostra a situação atual da pilha
 			System.out.println("\n" + simbolos);
 			int atual = simbolos.retirar();
 			int token = -1;
@@ -192,12 +185,15 @@ public class Sintatico {
 				System.out.println("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual]);
 				return;
 			} catch (InvalidTokenException e) {
+				//repassar a mensagem de erro do léxico, de quando um token não segue as regras da LMS
 				System.out.println(e.getLocalizedMessage());
 				return;
 			} catch (Exception e) {
 				System.out.println(e.getLocalizedMessage());
 				return;
 			}
+			
+			//debug: mostra o que há na frente da posição atual no código fonte
 			System.out.println("Codigo fonte: Linha " + lex.getLinha() + ": " + LEGENDA[token] +"; topo da pilha: " + LEGENDA[atual]);
 			String resto = "";
 			for (int k = lex.getPosicao(); k < codigoFonte.length(); k++) {
@@ -206,23 +202,27 @@ public class Sintatico {
 			System.out.println(resto);
 			//se símbolo atual da pilha é terminal:
 			if(atual < FIRST_NON_TERMINAL) {
-				System.out.println("VT");
-				System.out.println(lex.getUltimoLexema());
 				if (atual == token) {
-					
-				} else {
-					//não avançar na leitura do código fonte se tivermos um epsilon na pilha
+					//não é necessário fazer mais nada quando o símbolo terminal correto é encontrado,
+					//pois o processamento do algoritmo já irá ler o próximo token e desempilhar
+					//o primeiro item da pilha automaticamente.
+				} else { 
+					//cancelar o avanço na leitura do código fonte se tivermos um epsilon na pilha
 					if(atual == 0) {
 						lex.retorna();
 					} else {
-						System.out.println("Erro, esperava o... " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]); //TODO
+						//o símbolo atual na pilha não é esperado NEM o epsilon, isso é um erro
+						System.out.println("Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
+						return;
 					}
 				}
 			} else { //não é terminal
-				System.out.println("VN");
 				//como estaremos expandindo a produção atual na pilha em vez de retirar o token atual,
 				//devemos retroceder ao ponto anterior na leitura do código fonte.
 				lex.retorna();
+				//o acesso às produções na PARSER TABLE precisa tomar em consideração que
+				//não parte do símbolo 0 (EPSILON) mas sim do 1ª símbolo não terminal;
+				//também não possui a coluna do EPSILON
 				int idProducao = PARSER_TABLE[atual - START_SYMBOL][token - 1];
 				if (idProducao >= 0){
 					int [] producao = PRODUCTIONS[idProducao];
@@ -232,11 +232,11 @@ public class Sintatico {
 					}
 				} else {
 					//TODO: ter erro específico pra cada desencontro no sintático
-					System.out.println("Erro, esperava o... " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
+					System.out.println("Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
 					String sugestoes = "";
 					for (int i = 0; i < FIRST_NON_TERMINAL - 1; i++) {
 						if(PARSER_TABLE[atual - START_SYMBOL][i] >= 0) {
-							sugestoes += LEGENDA[i] + ", ";
+							sugestoes += LEGENDA[i+1] + ", ";
 						}
 					}
 					System.out.println("Sugestões: " + sugestoes + "em vez de " + lex.getUltimoLexema());
@@ -245,12 +245,12 @@ public class Sintatico {
 			}
 		} while (!lex.semTokens());
 		System.out.println("Arquivo processado com sucesso.");
+		//debug, mostra que apenas o $ localiza-se na pilha
 		System.out.println(simbolos);
 	}
 	
 	private static String importarCodigoFonte() {
-		// TODO Auto-generated method stub
-		return "Program testeproc1;\n Vaqr X, y, z :integer; Procedure P; Var A :integer; Begin Readln(a); If a=x then z:=z+x Else begin Z:=z-x; Call p; End; End;Begin; Z:=0; Readln(x,y); If x>y then Call p Else Z:=z+x+y;Writeln(z);End..";
+		return "Program testeproc1;\n Var X, y, z :integer; Procedure P; Var A :integer; Begin Readln(a); If a=x then z:=z+x Else begin Z:=z-x; Call p; End; End;Begin; Z:=0; Readln(x,y); If x>y then Call p Else Z:=z+x+y;Writeln(z);End.";
 	}
 	
 }
