@@ -4,7 +4,6 @@ import java.lang.Character;
 
 public class Lexico {
 	private char[] fonte;
-	private int linha;
 	private int posicao;
 	private int posicaoAnterior;
 	private int estado;
@@ -71,6 +70,7 @@ public class Lexico {
 	int CASE = 44;
 	int OF = 45;
 	final private int PRIMEIRA_RESERVADA = 22; //PROGRAM
+	//lista para facilitar o código que identifica qual palavra reservada foi detectada
 	final private String[] reservadas = new String[] {
 			"PROGRAM", "CONST", "VAR", "PROCEDURE", "BEGIN", "END",
 			"INTEGER", "CALL", "IF", "THEN", "ELSE", "WHILE", "DO",
@@ -81,11 +81,16 @@ public class Lexico {
 	public Lexico(char[] fonte) {
 		this.fonte = fonte;
 		this.posicao = 0;
-		this.linha = 0; 
 		this.esteToken = "";
 	}
 	
 	public int getLinha() {
+		int linha = 0;
+		for(int i = 0; i < posicao; i++) {
+			if(fonte[i] == '\n') {
+				linha++;
+			}
+		}
 		return linha;
 	}
 	
@@ -105,7 +110,7 @@ public class Lexico {
 			try {
 				atual = fonte[posicao];
 			} catch (Exception e) {
-				throw new Exception("");
+				throw e;
 			}
 			
 			//provavelmente colocar as estruturas abaixo dentro de um while(true)
@@ -114,10 +119,7 @@ public class Lexico {
 			case ENEUTRO:
 				if(Character.isWhitespace(atual)) {
 					//basicamente ignorar espaços, exceto \n, que incrementa o contador de linhas
-					if(atual == '\n') {
-						linha++;
-					}
-					
+					//porém os \n são contados apenas quando se solicita o número de linha
 				} else if (Character.isLetter(atual)) {
 					estado = EID;
 					esteToken += atual;
@@ -183,6 +185,7 @@ public class Lexico {
 					//acabou o identificador, voltar ao estado neutro sem avançar na leitura de
 					//caracteres do código-fonte.
 					estado = ENEUTRO;
+					//System.out.println(esteToken);
 					return tratarIdentificador(esteToken);
 				}
 				break;
@@ -190,7 +193,7 @@ public class Lexico {
 				if(Character.isDigit(atual)) {
 					esteToken += atual;
 				} else if(Character.isLetter(atual)) {
-					throw new Exception("Linha " + linha + ": Caractere inesperado '" 
+					throw new Exception("Linha " + getLinha() + ": Caractere inesperado '" 
 							+ atual + "' quando da leitura de um número");
 				} else {
 					estado = ENEUTRO;
@@ -206,6 +209,7 @@ public class Lexico {
 					estado = ENEUTRO;
 					return COLON;
 				}
+				//break;
 			case EMENOR:
 				if(atual == '=') {
 					estado = ENEUTRO;
@@ -286,7 +290,7 @@ public class Lexico {
 	
 	public int tratarIdentificador(String token) throws Exception {
 		if(token.length() > 30) {
-			throw new Exception("Linha " + linha + ": Identificador inválido: '" 
+			throw new Exception("Linha " + getLinha() + ": Identificador inválido: '" 
 					+ token + "' tem mais de 30 caracteres");
 		}
 		for(int i = 0; i < reservadas.length; i++) {
@@ -301,8 +305,8 @@ public class Lexico {
 	
 	public int tratarNumero(String token) throws Exception {
 		int numero = Integer.parseInt(token);
-		if(token.length() > 5 || numero > 32767 | numero < 32767) {
-			throw new Exception("Linha " + linha + ": Número inválido: '" 
+		if(numero > 32767 || numero < -32767) {
+			throw new Exception("Linha " + getLinha() + ": Número inválido: '" 
 					+ token + "' não está entre -32767 e 32767.");
 		}
 		ultimoLexema = token;
@@ -311,7 +315,7 @@ public class Lexico {
 	
 	public int tratarLiteral(String token) throws Exception {
 		if(token.length() > 255) {
-			throw new Exception("Linha " + linha + ": Literal inválido: '" 
+			throw new Exception("Linha " + getLinha() + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
 		ultimoLexema = token;
@@ -320,5 +324,9 @@ public class Lexico {
 	
 	public void retorna() {
 		posicao = posicaoAnterior;
+	}
+	
+	public boolean semTokens() {
+		return posicao >= fonte.length;
 	}
 }

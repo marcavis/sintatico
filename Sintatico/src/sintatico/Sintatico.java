@@ -138,121 +138,40 @@ public class Sintatico {
 	    		"program", "const", "var", "procedure", "begin", "end", "integer", "call",
 	    		"if", "then", "else", "while", "do", "repeat", "until", "readln", "writeln",
 	    		"or", "and", "not", "for", "to", "case", "of",
-	    		"definição de PROGRAMA",
-	    		"definição de BLOCO",
-	    		"definição de LID",
-	    		"definição de outro identificador",
-	    		"declaração de constante",
-	    		"declaração de constante",
-	    		"definição de variável",
-	    		"definição de variável",
-	    		"definição de tipo",
-	    		"definição de função",
-	    		"lista de parâmetros",
-	    		"definição de corpo de função",
-	    		"definição de outro comando",
-	    		"definição de comando",
-	    		"definição de parâmetros",
-	    		"definição de outro parâmetro",
-	    		"definição de ELSEPARTE",
-	    		"definição de variável",
-	    		"definição de outra variável",
-	    		"definição de saída",
-	    		"definição de outra saída",
-	    		"definição de expressão",
-	    		"definição de expressão simples",
-	    		"definição de expressão simples",
-	    		"definição de expressão",
-	    		"definição de termo",
-	    		"definição de outro termo",
-	    		"definição de fator",
-	    		"definição de opção do CASE",
-	    		"definição de próxima opção do CASE",
-	    		"definição de outro valor aceitável no CASE"
+	    		"<PROGRAMA>",
+	            "<BLOCO>",
+	            "<LID>",
+	            "<REPIDENT>",
+	            "<DCLCONST>",
+	            "<LDCONST>",
+	            "<DCLVAR>",
+	            "<LDVAR>",
+	            "<TIPO>",
+	            "<DCLPROC>",
+	            "<DEFPAR>",
+	            "<CORPO>",
+	            "<REPCOMANDO>",
+	            "<COMANDO>",
+	            "<PARAMETROS>",
+	            "<REPPAR>",
+	            "<ELSEPARTE>",
+	            "<VARIAVEL>",
+	            "<REPVARIAVEL>",
+	            "<ITEMSAIDA>",
+	            "<REPITEM>",
+	            "<EXPRESSAO>",
+	            "<REPEXPSIMP>",
+	            "<EXPSIMP>",
+	            "<REPEXP>",
+	            "<TERMO>",
+	            "<REPTERMO>",
+	            "<FATOR>",
+	            "<CONDCASE>",
+	            "<CONTCASE>",
+	            "<RPINTEIRO>"
 	    };
 	    
-	    String[] PARSER_ERROR =
-	    {
-	        "",
-	        "Era esperado fim de programa",
-	        "Era esperado \"(\"",
-	        "Era esperado \")\"",
-	        "Era esperado \",\"",
-	        "Era esperado \";\"",
-	        "Era esperado \".\"",
-	        "Era esperado \":\"",
-	        "Era esperado \":=\"",
-	        "Era esperado \"=\"",
-	        "Era esperado \"<\"",
-	        "Era esperado \">\"",
-	        "Era esperado \">=\"",
-	        "Era esperado \"<=\"",
-	        "Era esperado \"<>\"",
-	        "Era esperado \"+\"",
-	        "Era esperado \"-\"",
-	        "Era esperado \"*\"",
-	        "Era esperado \"/\"",
-	        "Era esperado id",
-	        "Era esperado num",
-	        "Era esperado literal",
-	        "Era esperado program",
-	        "Era esperado const",
-	        "Era esperado var",
-	        "Era esperado procedure",
-	        "Era esperado begin",
-	        "Era esperado end",
-	        "Era esperado integer",
-	        "Era esperado call",
-	        "Era esperado if",
-	        "Era esperado then",
-	        "Era esperado else",
-	        "Era esperado while",
-	        "Era esperado do",
-	        "Era esperado repeat",
-	        "Era esperado until",
-	        "Era esperado readln",
-	        "Era esperado writeln",
-	        "Era esperado or",
-	        "Era esperado and",
-	        "Era esperado not",
-	        "Era esperado for",
-	        "Era esperado to",
-	        "Era esperado case",
-	        "Era esperado of",
-	        "<PROGRAMA> inválido",
-	        "<BLOCO> inválido",
-	        "<LID> inválido",
-	        "<REPIDENT> inválido",
-	        "<DCLCONST> inválido",
-	        "<LDCONST> inválido",
-	        "<DCLVAR> inválido",
-	        "<LDVAR> inválido",
-	        "<TIPO> inválido",
-	        "<DCLPROC> inválido",
-	        "<DEFPAR> inválido",
-	        "<CORPO> inválido",
-	        "<REPCOMANDO> inválido",
-	        "<COMANDO> inválido",
-	        "<PARAMETROS> inválido",
-	        "<REPPAR> inválido",
-	        "<ELSEPARTE> inválido",
-	        "<VARIAVEL> inválido",
-	        "<REPVARIAVEL> inválido",
-	        "<ITEMSAIDA> inválido",
-	        "<REPITEM> inválido",
-	        "<EXPRESSAO> inválido",
-	        "<REPEXPSIMP> inválido",
-	        "<EXPSIMP> inválido",
-	        "<REPEXP> inválido",
-	        "<TERMO> inválido",
-	        "<REPTERMO> inválido",
-	        "<FATOR> inválido",
-	        "<CONDCASE> inválido",
-	        "<CONTCASE> inválido",
-	        "<RPINTEIRO> inválido"
-	    };
-		
-		String codigoFonte = importarCodigoFonte();
+	    String codigoFonte = importarCodigoFonte();
 		char[] fonte = new char[codigoFonte.length()];
 		
 		for (int i = 0; i < codigoFonte.length(); i++) {
@@ -263,18 +182,28 @@ public class Sintatico {
 		PilhaDinamica<Integer> simbolos = new PilhaDinamica<Integer>();
 		simbolos.inserir(DOLLAR);
 		simbolos.inserir(START_SYMBOL);
-		int i = 20;
 		do {
 			System.out.println("\n" + simbolos);
 			int atual = simbolos.retirar();
 			int token = -1;
 			try {
 				token = lex.proxToken();
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				System.out.println("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual]);
+				return;
+			} catch (InvalidTokenException e) {
+				System.out.println(e.getLocalizedMessage());
+				return;
+			} catch (Exception e) {
+				System.out.println(e.getLocalizedMessage());
 				return;
 			}
 			System.out.println("Codigo fonte: Linha " + lex.getLinha() + ": " + LEGENDA[token] +"; topo da pilha: " + LEGENDA[atual]);
+			String resto = "";
+			for (int k = lex.getPosicao(); k < codigoFonte.length(); k++) {
+				resto += codigoFonte.charAt(k);
+			}
+			System.out.println(resto);
 			//se símbolo atual da pilha é terminal:
 			if(atual < FIRST_NON_TERMINAL) {
 				System.out.println("VT");
@@ -282,8 +211,12 @@ public class Sintatico {
 				if (atual == token) {
 					
 				} else {
-					//System.out.println(atual + " - " + token);
-					//System.out.println("Erro, esperava o... " + LEGENDA[atual] + ", " + LEGENDA[token]); //TODO
+					//não avançar na leitura do código fonte se tivermos um epsilon na pilha
+					if(atual == 0) {
+						lex.retorna();
+					} else {
+						System.out.println("Erro, esperava o... " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]); //TODO
+					}
 				}
 			} else { //não é terminal
 				System.out.println("VN");
@@ -291,9 +224,6 @@ public class Sintatico {
 				//devemos retroceder ao ponto anterior na leitura do código fonte.
 				lex.retorna();
 				int idProducao = PARSER_TABLE[atual - START_SYMBOL][token - 1];
-				System.out.println(atual);
-				System.out.println(token);
-				System.out.println(idProducao);
 				if (idProducao >= 0){
 					int [] producao = PRODUCTIONS[idProducao];
 					//empilhar os símbolos da produção encontrada, em ordem inversa
@@ -302,16 +232,25 @@ public class Sintatico {
 					}
 				} else {
 					//TODO: ter erro específico pra cada desencontro no sintático
-					System.out.println(atual + ", " + token);
+					System.out.println("Erro, esperava o... " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
+					String sugestoes = "";
+					for (int i = 0; i < FIRST_NON_TERMINAL - 1; i++) {
+						if(PARSER_TABLE[atual - START_SYMBOL][i] >= 0) {
+							sugestoes += LEGENDA[i] + ", ";
+						}
+					}
+					System.out.println("Sugestões: " + sugestoes + "em vez de " + lex.getUltimoLexema());
+					return;
 				}
 			}
-			i--;
-		} while (i > 0);
+		} while (!lex.semTokens());
+		System.out.println("Arquivo processado com sucesso.");
+		System.out.println(simbolos);
 	}
 	
 	private static String importarCodigoFonte() {
 		// TODO Auto-generated method stub
-		return "Program testeproc1; Var X, y, z :integer; Procedure P; Var A :integer; Begin Readln(a); If a=x then z:=z+x Else begin Z:=z-x; Call p; End; End;Begin; Z:=0; Readln(x,y); If x>y then Call p Else Z:=z+x+y;Writeln(z);End.";
+		return "Program testeproc1;\n Vaqr X, y, z :integer; Procedure P; Var A :integer; Begin Readln(a); If a=x then z:=z+x Else begin Z:=z-x; Call p; End; End;Begin; Z:=0; Readln(x,y); If x>y then Call p Else Z:=z+x+y;Writeln(z);End..";
 	}
 	
 }
