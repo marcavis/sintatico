@@ -118,7 +118,7 @@ public class Principal {
 				int linhaDoErro = -1;
 				String msgErro = "";
 				try {
-					Sintatico.analisar(shell, caixaDeCodigo.getText());
+					Sintatico.analisar(shell, caixaDeCodigo.getText().trim());
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
