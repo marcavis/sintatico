@@ -136,28 +136,34 @@ public class Lexico {
 				} else if (atual == ')') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = ")";
 					return RPAREN;
 				} else if (atual == '(') {
 					estado = ELPAREN;
 				} else if (atual == '+') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "+";
 					return PLUS;
 				} else if (atual == '-') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "-";
 					return MINUS;
 				} else if (atual == '*') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "*";
 					return ASTERISK;
 				} else if (atual == '/') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "/";
 					return SLASH;
 				} else if (atual == '=') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "=";
 					return EQUALS;
 				} else if (atual == '>') {
 					estado = EMAIOR;
@@ -168,14 +174,17 @@ public class Lexico {
 				} else if (atual == ';') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = ";";
 					return SEMICOLON;
 				} else if (atual == ',') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = ",";
 					return COMMA;
 				} else if (atual == '.') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = ".";
 					return PERIOD;
 				} else {
 					throw new InvalidTokenException("Linha " + getLinha() + ": Caractere \"" + atual + "\" inválido encontrado.");
@@ -210,9 +219,11 @@ public class Lexico {
 				if(atual == '=') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = ":=";
 					return ATTRIBUTION;
 				} else {
 					estado = ENEUTRO;
+					ultimoLexema = ":";
 					return COLON;
 				}
 				//break;
@@ -220,15 +231,18 @@ public class Lexico {
 				if(atual == '=') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "<=";
 					return LE;
 				} else if(atual == '>') {
 					estado = ENEUTRO;
 					posicao++;
+					ultimoLexema = "<>";
 					return DIFFERENT;
 				} else {
 					//foi encontrado apenas '<', não seguir adiante e devolver o 
 					//estado para o padrão
 					estado = ENEUTRO;
+					ultimoLexema = "<";
 					return LT;
 				}
 				//break;
@@ -258,6 +272,7 @@ public class Lexico {
 					estado = ECOMENT;
 				} else {
 					estado = ENEUTRO;
+					ultimoLexema = "(";
 					return LPAREN;
 				}
 				break;
@@ -292,6 +307,7 @@ public class Lexico {
 	//se for um identificador válido retorna o código de identificador normal
 	//ou o código de alguma palavra reservada específica
 	public int tratarIdentificador(String token) throws Exception {
+		ultimoLexema = token;
 		if(token.length() > 30) {
 			throw new InvalidTokenException("Linha " + getLinha() + ": Identificador inválido: '" 
 					+ token + "' tem mais de 30 caracteres");
@@ -302,28 +318,27 @@ public class Lexico {
 				return PRIMEIRA_RESERVADA + i;
 			}
 		}
-		ultimoLexema = token;
 		return ID; //código de token do tipo ID
 	}
 	
 	//retorna o código de token de número inteiro, se for um número permitido pela linguagem
 	public int tratarNumero(String token) throws Exception {
+		ultimoLexema = token;
 		int numero = Integer.parseInt(token);
 		if(numero > 32767 || numero < -32767) {
 			throw new InvalidTokenException("Linha " + getLinha() + ": Número inválido: '" 
 					+ token + "' não está entre -32767 e 32767.");
 		}
-		ultimoLexema = token;
 		return INTEIRO;
 	}
 	
 	//retorna o código de token de literal ("string"), se for um literal válido
 	public int tratarLiteral(String token) throws Exception {
+		ultimoLexema = token;
 		if(token.length() > 255) {
 			throw new InvalidTokenException("Linha " + getLinha() + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
-		ultimoLexema = token;
 		return LITERAL; //código de token do tipo ID
 	}
 	
@@ -334,6 +349,7 @@ public class Lexico {
 	
 	//informa se chegamos no fim do código fonte
 	public boolean semTokens() {
+		System.out.println(posicao + " - " + fonte.length);
 		return posicao >= fonte.length;
 	}
 }

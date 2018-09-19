@@ -60,7 +60,9 @@ public class Principal {
 				try {
 					String codigoFonte = readFile(selected, Charset.defaultCharset());
 					System.out.println(codigoFonte);
-					caixaDeCodigo.setText(codigoFonte);
+					//Usa-se a função trim() para mandar o código ao analisador sem espaços vazios
+					//à esquerda e à direita, para que o léxico não se confunda ao procurar o fim do arquivo.
+					caixaDeCodigo.setText(codigoFonte.trim());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -108,16 +110,35 @@ public class Principal {
 
 		Button btnHilight = new Button(shell, SWT.NONE);
 		btnHilight.setBounds(158, 282, 100, 36);
-		btnHilight.setText("Hilight");
+		btnHilight.setText("Analisar");
 		btnHilight.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				StyleRange sr = new StyleRange();
-				sr.foreground = new Color(display, 255, 75, 0);
-				sr.start = 0;
-				sr.length = 31;
-				caixaDeCodigo.setStyleRange(sr);
-				//Color orange = new Color(display, 255, 127, 0);
-				//caixaDeCodigo.setLineBackground(2, 1, orange);
+				//atualizar a janela de código para remover linhas que tenham sido pintadas anteriormente
+				caixaDeCodigo.setText(caixaDeCodigo.getText());
+				int linhaDoErro = -1;
+				String msgErro = "";
+				try {
+					Sintatico.analisar(shell, caixaDeCodigo.getText());
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					linhaDoErro = ((SintaticoException) e1).getLinha();
+					msgErro = ((SintaticoException) e1).getAviso();
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR
+							| SWT.OK);
+					messageBox.setMessage(msgErro);
+					messageBox.setText("Erro");
+					messageBox.open();
+					caixaDeCodigo.setLineBackground(linhaDoErro, 1, new Color(display, 255,127,127));
+				}
+				//informar sucesso se não foi encontrado erro
+				if (linhaDoErro == -1) {
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION
+							| SWT.OK);
+					messageBox.setMessage("Arquivo processado com sucesso.");
+					messageBox.setText("Sucesso!");
+					messageBox.open();
+				}
 			}
 		});
 		shell.open();

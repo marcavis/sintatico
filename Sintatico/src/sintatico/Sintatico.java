@@ -1,7 +1,11 @@
 package sintatico;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+
 public class Sintatico {
-	public static void main(String[] args) {
+	public static void analisar(Shell shell, String codigoFonte) throws Exception {
 		int EPSILON = 0;
 		int DOLLAR = 1;
 	    int START_SYMBOL = 46;
@@ -162,7 +166,6 @@ public class Sintatico {
 	            "<RPINTEIRO>"
 	    };
 	    
-	    String codigoFonte = importarCodigoFonte();
 		char[] fonte = new char[codigoFonte.length()];
 		
 		for (int i = 0; i < codigoFonte.length(); i++) {
@@ -182,15 +185,12 @@ public class Sintatico {
 			try {
 				token = lex.proxToken();
 			} catch (ArrayIndexOutOfBoundsException e) {
-				System.out.println("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual]);
-				return;
+				throw new SintaticoException("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual], lex.getLinha());
 			} catch (InvalidTokenException e) {
 				//repassar a mensagem de erro do léxico, de quando um token não segue as regras da LMS
-				System.out.println(e.getLocalizedMessage());
-				return;
+				throw new SintaticoException(e.getMessage(), lex.getLinha());
 			} catch (Exception e) {
-				System.out.println(e.getLocalizedMessage());
-				return;
+				throw new SintaticoException(e.getMessage(), lex.getLinha());
 			}
 			
 			//debug: mostra o que há na frente da posição atual no código fonte
@@ -212,8 +212,9 @@ public class Sintatico {
 						lex.retorna();
 					} else {
 						//o símbolo atual na pilha não é esperado NEM o epsilon, isso é um erro
-						System.out.println("Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
-						return;
+						String aviso = "Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token];
+						System.out.println(aviso);
+						throw new SintaticoException(aviso, lex.getLinha());
 					}
 				}
 			} else { //não é terminal
@@ -232,25 +233,23 @@ public class Sintatico {
 					}
 				} else {
 					//TODO: ter erro específico pra cada desencontro no sintático
-					System.out.println("Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token]);
+					String aviso = "Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token];
+					System.out.println(aviso);
 					String sugestoes = "";
 					for (int i = 0; i < FIRST_NON_TERMINAL - 1; i++) {
 						if(PARSER_TABLE[atual - START_SYMBOL][i] >= 0) {
 							sugestoes += LEGENDA[i+1] + ", ";
 						}
 					}
-					System.out.println("Sugestões: " + sugestoes + "em vez de " + lex.getUltimoLexema());
-					return;
+					aviso += "\nSugestões: " + sugestoes + "em vez de " + lex.getUltimoLexema();
+					throw new SintaticoException(aviso, lex.getLinha());
 				}
 			}
+			System.out.println(lex.semTokens());
 		} while (!lex.semTokens());
 		System.out.println("Arquivo processado com sucesso.");
 		//debug, mostra que apenas o $ localiza-se na pilha
 		System.out.println(simbolos);
-	}
-	
-	private static String importarCodigoFonte() {
-		return "Program testeproc1;\n Var X, y, z :integer; Procedure P; Var A :integer; Begin Readln(a); If a=x then z:=z+x Else begin Z:=z-x; Call p; End; End;Begin; Z:=0; Readln(x,y); If x>y then Call p Else Z:=z+x+y;Writeln(z);End.";
 	}
 	
 }
