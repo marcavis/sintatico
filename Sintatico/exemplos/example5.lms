@@ -1,0 +1,9 @@
+Program Teste5;
+
+Const idade = 50;
+
+Begin
+	Writeln("Quantos netos você tem?");
+	readln(netos); (*erro semântico, variavel nao inicializada*)
+	Writeln("Voce tem",idade," anos e ",netos," netos.");
+End.   
