@@ -56,6 +56,8 @@ public class Principal {
 				String[] filterExt = { "*.*", "*.txt", "*.lms", "*.*"};
 				fileDialog.setFilterExtensions(filterExt);
 				String selected = fileDialog.open();
+				if(selected == null)
+					return;
 				System.out.println(selected);
 				try {
 					String codigoFonte = readFile(selected, Charset.defaultCharset());
@@ -106,7 +108,6 @@ public class Principal {
 
 		caixaDeCodigo = new StyledText(shell, SWT.BORDER);
 		caixaDeCodigo.setBounds(30, 10, 332, 266);
-		//styledText.setText("fasdfasdf\nasdjasdij");
 
 		Button btnHilight = new Button(shell, SWT.NONE);
 		btnHilight.setBounds(158, 282, 100, 36);

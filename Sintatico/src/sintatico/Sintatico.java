@@ -228,11 +228,11 @@ public class Sintatico {
 				if (idProducao >= 0){
 					int [] producao = PRODUCTIONS[idProducao];
 					//empilhar os símbolos da produção encontrada, em ordem inversa
+					//(ou, digamos, ordem vertical)
 					for (int j = producao.length - 1; j >= 0; j--) {
 						simbolos.inserir(producao[j]);
 					}
 				} else {
-					//TODO: ter erro específico pra cada desencontro no sintático
 					String aviso = "Erro, esperava o " + LEGENDA[atual] + ", encontrou " + LEGENDA[token];
 					System.out.println(aviso);
 					String sugestoes = "";
