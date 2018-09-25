@@ -12,14 +12,30 @@ public class Hash {
 	//métodos que não sejam "buscar" retornam o código hash calculado
 	//quando há sucesso, e -1 quando o registro não é encontrado.
 	
+	//retorna -1 quando o símbolo já existe na tabela; não é da alçada
+	//da tabela hash fazer a conversão alpha criando um símbolo diferente
 	public int inserir(Simbolo s) {
 		int hash = horner(s.getNome());
+		
 		//não há colisão
 		if(lista[hash] == null) {
 			lista[hash] = new NodeSimbolo(s);
 		} else {
-			//TODO: e se estivermos tentando adicionar algo com o mesmo nome?
-			lista[hash].adicionaProximo(s);
+			
+			NodeSimbolo atual = lista[hash];
+			NodeSimbolo anterior = lista[hash];
+			while(atual != null) {
+				String nomeAtual = atual.valor.getNome();
+				if(nomeAtual.equals(s.getNome())) {
+					//já existe na tabela
+					return -1;
+				}
+				anterior = atual;
+				atual = atual.next;
+			} 
+			//não existe tal símbolo, então podemos incluí-lo
+			anterior.next = new NodeSimbolo(s);
+			return hash;
 		}
 		return hash;
 	}
@@ -114,7 +130,23 @@ public class Hash {
 	//retorna um número primo ligeiramente menor que o dobro do número solicitado
 	//para resultar em uma tabela de hash com taxa de ocupação de até 50%
 	//(se não houver colisão)
+	//para isso, vamos implementar o Crivo de Eratóstenes
 	public int tamanhoCerto(int numero) {
-		return numero*2; //TODO
+		//return numero*2; //TODO
+		boolean[] composto = new boolean[numero*2]; //começa informando false pra todos os números
+		for (int i = 2; i < numero * 2; i++) {
+			if (!composto[i]) {
+				for (int j = i*i; j > 0 && j < numero * 2; j+=i) {
+					composto[j] = true;
+				}
+			}
+		}
+		for(int i = numero*2 - 1; i > 0; i--) {
+			if(!composto[i]) {
+				return i;
+			}
+		}
+		//nunca vai acontecer, já que sempre haverá um 
+		return numero*2 - 1;
 	}
 }
