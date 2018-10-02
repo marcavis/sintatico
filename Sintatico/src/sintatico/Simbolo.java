@@ -11,6 +11,8 @@ public class Simbolo {
 		this.nome = nome;
 	}
 	
+	//public 
+	
 	public String getNome() {
 		return nome;
 	}

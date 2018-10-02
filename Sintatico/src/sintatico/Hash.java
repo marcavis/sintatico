@@ -40,6 +40,8 @@ public class Hash {
 		return hash;
 	}
 	
+	//retorna o código hash calculado
+	//quando há sucesso, e -1 quando o registro não é encontrado.
 	public int remover(Simbolo s) {
 		int hash = horner(s.getNome());
 		if(lista[hash] == null) {
@@ -148,5 +150,40 @@ public class Hash {
 		}
 		//nunca vai acontecer, já que sempre haverá um 
 		return numero*2 - 1;
+	}
+	
+	@Override
+	public String toString() {
+		String saida = String.format("%32s", "Nome");
+		saida += " | " + "  Categoria ";
+		saida += " | " + "  Nível ";
+		saida += " | " + " GeralA ";
+		saida += " | " + " GeralB ";
+		saida += " | " + String.format("%28s", "Next    ");
+		saida += "\n";
+		saida += "-------------------------------------------------------------------------------------------------------------------\n";
+		for (NodeSimbolo nodeSimbolo : lista) {
+			NodeSimbolo ponteiro = nodeSimbolo;
+			while (ponteiro != null) {
+				Simbolo s = ponteiro.valor;
+				saida += String.format("%32s", s.getNome());
+				saida += " | " + String.format("%12s", s.getCategoria());
+				saida += " | " + String.format("%8s", s.getNivel());
+				saida += " | " + String.format("%8s", s.getGeralA());
+				saida += " | " + String.format("%8s", s.getGeralB());
+				saida += " | " + String.format("%32s", nomeSeTiver(ponteiro.next));
+				saida += "\n";
+				//saida += horner(nodeSimbolo.valor.getNome()) + ": " + nodeSimbolo + ": " + nodeSimbolo.valor.getNome() + "\n";
+				ponteiro = ponteiro.next;
+			}
+		}
+		return saida;
+	}
+	
+	public String nomeSeTiver(NodeSimbolo ns) {
+		if (ns != null) {
+			return ns.valor.getNome();
+		}
+		return "null";
 	}
 }

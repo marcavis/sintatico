@@ -5,9 +5,11 @@ import sintatico.Simbolo;
 
 public class Principal {
 	public static void main(String[] args) {
-		Hash h = new Hash(300);
+		Hash h = new Hash(400);
 		//System.out.println(h.horner("string"));
-		
-		h.inserir(new Simbolo("gha"));
+		for(int i = 0; i < 500; i++) {
+			h.inserir(new Simbolo(""+(i*27)));
+		}
+		System.out.println(h);
 	}
 }

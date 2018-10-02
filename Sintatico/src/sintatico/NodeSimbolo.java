@@ -7,5 +7,4 @@ public class NodeSimbolo {
 	public NodeSimbolo(Simbolo v) {
 		this.valor = v;
 	}
-	
 }
