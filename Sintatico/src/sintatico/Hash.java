@@ -82,6 +82,11 @@ public class Hash {
 		}
 	}
 	
+	//função que remove um símbolo precisando apenas do nome dele
+	public int remover(String nome) {
+		return remover(new Simbolo(nome, Categoria.VAR, 0, 0));
+	}
+	
 	public Simbolo buscar(String nome) throws Exception {
 		int hash = horner(nome);
 		NodeSimbolo atual = lista[hash];
@@ -112,17 +117,29 @@ public class Hash {
 		return hash;
 	}
 	
+	//versão de atualizar que recebe os campos em vez de
+	//receber um símbolo temporário
+	public int atualizar(String nome, Categoria cat, int nivel, int geralA, int geralB) {
+		return atualizar(new Simbolo(nome, cat, nivel, geralA, geralB));
+	}
+	
+	//similar ao caso acima, mas sem geralB
+	public int atualizar(String nome, Categoria cat, int nivel, int geralA) {
+		return atualizar(new Simbolo(nome, cat, nivel, geralA));
+	}
+	
 	public int horner(String string) {
 		if(string.length() == 0) {
 			return 0;
 		}
 		char[] vetor = string.toCharArray();
-		int indice = (int) vetor[vetor.length -1];
+		long indice = (int) vetor[vetor.length -1];
 		for (int i = vetor.length - 2; i >= 0; i--) {
 			indice = 37 * ((int) vetor[i] + indice);
 			
 		}
-		return indice % getTamanho();
+		indice = indice % getTamanho();
+		return (int) indice;
 	}
 	
 	public int getTamanho() {

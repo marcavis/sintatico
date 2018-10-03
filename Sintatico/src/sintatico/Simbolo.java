@@ -11,7 +11,21 @@ public class Simbolo {
 		this.nome = nome;
 	}
 	
-	//public 
+	public Simbolo(String nome, Categoria categoria, int nivel, int geralA, int geralB) {
+		this.nome = nome;
+		this.categoria = categoria;
+		this.nivel = nivel;
+		this.geralA = geralA;
+		this.geralB = geralB;
+	}
+	
+	//construtor sem geralB, não necessário para algumas categorias
+	public Simbolo(String nome, Categoria categoria, int nivel, int geralA) {
+		this.nome = nome;
+		this.categoria = categoria;
+		this.nivel = nivel;
+		this.geralA = geralA;
+	}
 	
 	public String getNome() {
 		return nome;
@@ -43,4 +57,12 @@ public class Simbolo {
 	public void setGeralB(int geralB) {
 		this.geralB = geralB;
 	}
+
+	@Override
+	public String toString() {
+		return "Simbolo [nome=" + nome + ", categoria=" + categoria + ", nivel=" + nivel + ", geralA=" + geralA
+				+ ", geralB=" + geralB + "]";
+	}
+	
+
 }
