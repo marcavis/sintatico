@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -16,6 +17,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
@@ -30,7 +34,7 @@ public class Principal {
 	Principal() {
 		display = new Display();
 		shell = new Shell(display);
-		shell.setSize(400, 400);
+		shell.setSize(600, 600);
 
 		shell.setText("Analisador LMS");
 		Menu m = new Menu(shell, SWT.BAR);
@@ -107,12 +111,76 @@ public class Principal {
 		shell.setMenuBar(m);
 
 		caixaDeCodigo = new StyledText(shell, SWT.BORDER);
-		caixaDeCodigo.setBounds(30, 10, 332, 266);
+		caixaDeCodigo.setBounds(30, 10, 532, 466);
 
-		Button btnHilight = new Button(shell, SWT.NONE);
-		btnHilight.setBounds(158, 282, 100, 36);
-		btnHilight.setText("Analisar");
-		btnHilight.addSelectionListener(new SelectionAdapter() {
+		Button btnLexico = new Button(shell, SWT.NONE);
+		btnLexico.setBounds(138, 482, 100, 36);
+		btnLexico.setText("Léxico");
+		btnLexico.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//atualizar a janela de código para remover linhas que tenham sido pintadas anteriormente
+				caixaDeCodigo.setText(caixaDeCodigo.getText());
+				int linhaDoErro = -1;
+				String msgErro = "";
+				ArrayList<String[]> tabelaDeTokens = new ArrayList<String[]>();
+				try {
+					tabelaDeTokens = Sintatico.soLexico(shell, caixaDeCodigo.getText().trim());
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					linhaDoErro = ((SintaticoException) e1).getLinha();
+					msgErro = ((SintaticoException) e1).getAviso();
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR
+							| SWT.OK);
+					messageBox.setMessage(msgErro);
+					messageBox.setText("Erro");
+					messageBox.open();
+					caixaDeCodigo.setLineBackground(linhaDoErro, 1, new Color(display, 255,127,127));
+				}
+				//informar sucesso se não foi encontrado erro
+				if (linhaDoErro == -1) {
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION
+							| SWT.OK);
+					messageBox.setMessage("Arquivo processado com sucesso.");
+					messageBox.setText("Sucesso!");
+					messageBox.open();
+				}
+				
+				Shell shellTabela = new Shell(display);
+				shellTabela.setSize(400, 300);
+				
+				Table tabela = new Table(shellTabela, SWT.BORDER | SWT.V_SCROLL
+						| SWT.H_SCROLL);
+				
+				String[] titulos = { "Código", "Descrição", "Lexema" };
+				for (int i = 0; i < titulos.length; i++) {
+					TableColumn column = new TableColumn(tabela, SWT.NONE);
+					column.setText(titulos[i]);
+				}
+				TableItem qqq = new TableItem(tabela, SWT.NONE);
+				qqq.setText(new String[] {"hsfa", "vads", "dasd"});
+				tabela.setHeaderVisible(true);
+				tabela.setLinesVisible(true);
+				tabela.setBounds(20, 20, 360, 200);
+				tabela.getColumn(0).pack();
+				tabela.getColumn(1).pack();
+				tabela.getColumn(2).pack();
+				
+				shellTabela.pack();
+				shellTabela.open();
+				for (String[] s : tabelaDeTokens) {
+					for (String t : s) {
+						System.out.print(t);
+					}
+					System.out.println("");
+				}
+			}
+		});
+		
+		Button btnSintatico = new Button(shell, SWT.NONE);
+		btnSintatico.setBounds(258, 482, 100, 36);
+		btnSintatico.setText("Sintático");
+		btnSintatico.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//atualizar a janela de código para remover linhas que tenham sido pintadas anteriormente
 				caixaDeCodigo.setText(caixaDeCodigo.getText());

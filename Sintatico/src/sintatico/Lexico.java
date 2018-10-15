@@ -349,7 +349,6 @@ public class Lexico {
 	
 	//informa se chegamos no fim do código fonte
 	public boolean semTokens() {
-		System.out.println(posicao + " - " + fonte.length);
 		return posicao >= fonte.length;
 	}
 }
