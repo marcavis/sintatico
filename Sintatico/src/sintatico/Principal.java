@@ -157,8 +157,11 @@ public class Principal {
 					TableColumn column = new TableColumn(tabela, SWT.NONE);
 					column.setText(titulos[i]);
 				}
-				TableItem qqq = new TableItem(tabela, SWT.NONE);
-				qqq.setText(new String[] {"hsfa", "vads", "dasd"});
+				for (int linha = 0; linha < tabelaDeTokens.size(); linha++) {
+					TableItem esteToken = new TableItem(tabela, SWT.NONE);
+					String[] estaLinha = tabelaDeTokens.get(linha); 
+					esteToken.setText(new String[] {estaLinha[0], estaLinha[1], estaLinha[2]});
+				}
 				tabela.setHeaderVisible(true);
 				tabela.setLinesVisible(true);
 				tabela.setBounds(20, 20, 360, 200);

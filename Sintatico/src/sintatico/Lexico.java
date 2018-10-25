@@ -259,13 +259,12 @@ public class Lexico {
 				}
 				//break;
 			case ELITERAL:
+				esteToken += atual;
 				if(atual == '"') {
 					estado = ENEUTRO;
 					posicao++;
 					return tratarLiteral(esteToken);
-				} else {
-					esteToken += atual;
-				}
+				} 
 				break;
 			case ELPAREN:
 				if(atual == '*') {
@@ -335,7 +334,9 @@ public class Lexico {
 	//retorna o código de token de literal ("string"), se for um literal válido
 	public int tratarLiteral(String token) throws Exception {
 		ultimoLexema = token;
-		if(token.length() > 255) {
+		
+		//permitir strings com 2 caracteres a mais que o limite já que as aspas estão sendo contadas
+		if(token.length() > 255 + 2) {
 			throw new InvalidTokenException("Linha " + getLinha() + ": Literal inválido: '" 
 					+ token + "' tem mais de 255 caracteres");
 		}
