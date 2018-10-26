@@ -1,0 +1,180 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = Java
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = true
+ScannerTable = Full
+Input = Stream
+Parser = LL
+#RegularDefinitions
+L  : [A-Za-z]
+D  : [0-9]
+WS : [\ \t\n\r] //simbolos especiais e branco
+COMMENT : "(*" [^ "*" ]* "*)"  //comentário
+
+#Tokens
+//pontuação
+"("
+")"
+","
+";"
+"."
+":"
+":="
+"="
+"<"
+">"
+">="
+"<="
+"<>"
+"+"
+"-"
+"*"
+"/"
+
+//tokens
+id : {L} ( {L} | {D} | _ )*
+num : {D}+ //um ou mais dígitos
+literal: ( {L} | {D} ) * //nao eh a definicao correta, mas o lexico do gals nao eh usado
+
+//palavras chave
+program = id : "program"
+const = id : "const"
+var = id : "var"
+procedure = id : "procedure"
+begin = id : "begin"
+end = id : "end"
+integer = id : "integer"
+call = id : "call"
+if = id : "if"
+then = id : "then"
+else = id : "else"
+while = id : "while"
+do = id : "do"
+repeat = id : "repeat"
+until = id : "until"
+readln = id : "readln"
+writeln = id : "writeln"
+or = id : "or"
+and = id : "and"
+not = id : "not"
+for = id : "for"
+to = id : "to"
+case = id : "case"
+of = id : "of"
+
+
+//ignorar espaços em branco, caracteres especiais e comentários
+ : {WS}*
+ :! {COMMENT}
+
+#NonTerminals
+<PROGRAMA>
+<BLOCO>
+<LID>
+<REPIDENT>
+<DCLCONST>
+<LDCONST>
+<DCLVAR>
+<LDVAR>
+<TIPO>
+<DCLPROC>
+<DEFPAR>
+<CORPO>
+<REPCOMANDO>
+<COMANDO>
+<PARAMETROS>
+<REPPAR>
+<ELSEPARTE>
+<VARIAVEL>
+<REPVARIAVEL>
+<ITEMSAIDA>
+<REPITEM>
+<EXPRESSAO>
+<REPEXPSIMP>
+<EXPSIMP>
+<REPEXP>
+<TERMO>
+<REPTERMO>
+<FATOR>
+<CONDCASE>
+<CONTCASE>
+<RPINTEIRO>
+#Grammar
+<PROGRAMA> ::= program id #100 ";" <BLOCO> "." #101;
+<BLOCO> ::= <DCLCONST> <DCLVAR> #102 <DCLPROC> <CORPO>;
+<LID> ::= id #104 <REPIDENT>;
+<REPIDENT> ::= î;
+<REPIDENT> ::= "," id #104 <REPIDENT>;
+<DCLCONST> ::= const id #105 "=" num #106 ";" <LDCONST>;
+<LDCONST> ::= î;
+<LDCONST> ::= id #105 "=" num #106 ";" <LDCONST>;
+<DCLCONST> ::= î;
+<DCLVAR> ::= var #107 <LID> ":" <TIPO> ";" <LDVAR>;
+<LDVAR> ::= î;
+<LDVAR> ::= <LID> ":" <TIPO> ";" <LDVAR>;
+<DCLVAR> ::= î;
+<TIPO> ::= integer;
+<DCLPROC> ::= procedure id #108 <DEFPAR> ";" #109 <BLOCO> ";" #110 <DCLPROC> ;
+<DCLPROC> ::= î;
+<DEFPAR> ::= î;
+<DEFPAR> ::= "(" #111 <LID> ":" integer ")";
+<CORPO> ::= begin <COMANDO> <REPCOMANDO> end;
+<REPCOMANDO> ::= î;
+<REPCOMANDO> ::= ";" <COMANDO> <REPCOMANDO>;
+<COMANDO> ::= id #114 ":=" <EXPRESSAO> #115;
+<COMANDO> ::= <CORPO>;
+<COMANDO> ::= î;
+<COMANDO> ::= call id #116 <PARAMETROS> #117;
+<PARAMETROS> ::= î;
+<PARAMETROS> ::= "(" <EXPRESSAO> #118 <REPPAR> ")";
+<REPPAR> ::= î;
+<REPPAR> ::= "," <EXPRESSAO> #118 <REPPAR>;
+<COMANDO> ::= if <EXPRESSAO> #120 then <COMANDO> <ELSEPARTE> #121;
+<ELSEPARTE> ::= î;
+<ELSEPARTE> ::= #122 else <COMANDO>;
+<COMANDO> ::= while #123 <EXPRESSAO> #124 do <COMANDO> #125;
+<COMANDO> ::= repeat #126 <COMANDO> until <EXPRESSAO> #127;
+<COMANDO> ::= readln #128 "(" <VARIAVEL> <REPVARIAVEL> ")";
+<VARIAVEL> ::= id #129;
+<REPVARIAVEL>::= î;
+<REPVARIAVEL>::= "," <VARIAVEL> <REPVARIAVEL>;
+<COMANDO> ::= writeln "(" <ITEMSAIDA> <REPITEM> ")";
+<ITEMSAIDA> ::= literal #130;
+<ITEMSAIDA> ::= <EXPRESSAO> #131;
+<REPITEM> ::= î;
+<REPITEM> ::= "," <ITEMSAIDA> <REPITEM>;
+<COMANDO> ::= case #132 <EXPRESSAO> of <CONDCASE> end #133;
+<CONDCASE> ::= num <RPINTEIRO> ":" #134 <COMANDO> #135 <CONTCASE>;
+<RPINTEIRO> ::= "," #136 num <RPINTEIRO>;
+<RPINTEIRO> ::= î ;
+<CONTCASE> ::= î ;
+<CONTCASE> ::= ";" <CONDCASE>;
+<COMANDO> ::= for id #137 ":=" <EXPRESSAO> #138 to <EXPRESSAO> #139 do <COMANDO> #140 ;
+<EXPRESSAO> ::= <EXPSIMP> <REPEXPSIMP>;
+<REPEXPSIMP> ::= î;
+<REPEXPSIMP> ::= "=" <EXPSIMP> #141 ;
+<REPEXPSIMP> ::= "<" <EXPSIMP> #142 ;
+<REPEXPSIMP> ::= ">" <EXPSIMP> #143 ;
+<REPEXPSIMP> ::= ">=" <EXPSIMP> #144 ;
+<REPEXPSIMP> ::= "<=" <EXPSIMP> #145 ;
+<REPEXPSIMP> ::= "<>" <EXPSIMP> #146 ;
+<EXPSIMP> ::= "+" <TERMO> <REPEXP> ;
+<EXPSIMP> ::= "-" <TERMO> #147 <REPEXP> ;
+<EXPSIMP> ::= <TERMO> <REPEXP> ; //hmmmmm
+<REPEXP> ::= "+" <TERMO> #148 <REPEXP>;
+<REPEXP> ::= "-" <TERMO> #149 <REPEXP>;
+<REPEXP> ::= or <TERMO> #150 <REPEXP>;
+<REPEXP> ::= î;
+<TERMO> ::= <FATOR> <REPTERMO>;
+<REPTERMO> ::= î;
+<REPTERMO> ::= "*" <FATOR> #151 <REPTERMO>;
+<REPTERMO> ::= "/" <FATOR> #152 <REPTERMO>;
+<REPTERMO> ::= and <FATOR> #153 <REPTERMO>;
+<FATOR> ::= num #154;
+<FATOR> ::= "(" <EXPRESSAO> ")" ;
+<FATOR> ::= not <FATOR> #155 ;
+<FATOR> ::= #156 <VARIAVEL>;
