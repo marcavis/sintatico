@@ -164,7 +164,14 @@ public class Sintatico {
             "<FATOR>",
             "<CONDCASE>",
             "<CONTCASE>",
-            "<RPINTEIRO>"
+            "<RPINTEIRO>",
+            "","","","","","","","","","","","","","","","","","","","","","","",
+            "#100","#101","#102","#103","#104","#105","#106","#107","#108","#109",
+            "#110","#111","#112","#113","#114","#115","#116","#117","#118","#119",
+            "#120","#121","#122","#123","#124","#125","#126","#127","#128","#129",
+            "#130","#131","#132","#133","#134","#135","#136","#137","#138","#139",
+            "#140","#141","#142","#143","#144","#145","#146","#147","#148","#149",
+            "#150","#151","#152","#153","#154","#155","#156"
     };
     
     //Executa apenas a análise léxica, mas adicionalmente retorna uma tabela dos tokens identificados
@@ -233,6 +240,7 @@ public class Sintatico {
 			}
 			
 			//debug: mostra o que há na frente da posição atual no código fonte
+			System.out.println("ULTIMO " + lex.getUltimoLexema());
 			System.out.println("Codigo fonte: Linha " + lex.getLinha() + ": " + LEGENDA[token] +"; topo da pilha: " + LEGENDA[atual]);
 			String resto = "";
 			for (int k = lex.getPosicao(); k < codigoFonte.length(); k++) {
@@ -256,7 +264,7 @@ public class Sintatico {
 						throw new SintaticoException(aviso, lex.getLinha());
 					}
 				}
-			} else { //não é terminal
+			} else if (atual < FIRST_SEMANTIC_ACTION) { //não é terminal
 				//como estaremos expandindo a produção atual na pilha em vez de retirar o token atual,
 				//devemos retroceder ao ponto anterior na leitura do código fonte.
 				lex.retorna();
@@ -283,6 +291,10 @@ public class Sintatico {
 					aviso += "\nSugestões: " + sugestoes + "em vez de " + lex.getUltimoLexema();
 					throw new SintaticoException(aviso, lex.getLinha());
 				}
+			} else {
+				//eh acao semantica
+				System.out.println("Acao semantica, por enquanto ignorar");
+				simbolos.retirar();
 			}
 			System.out.println(lex.semTokens());
 		} while (!lex.semTokens());
