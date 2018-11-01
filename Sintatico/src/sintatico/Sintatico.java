@@ -211,7 +211,7 @@ public class Sintatico {
 		return tabela;
     }
 	
-	public static void analisar(Shell shell, String codigoFonte) throws Exception {
+	public static void analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
 		char[] fonte = new char[codigoFonte.length()];
 		
 		for (int i = 0; i < codigoFonte.length(); i++) {
@@ -231,6 +231,11 @@ public class Sintatico {
 			try {
 				token = lex.proxToken();
 			} catch (ArrayIndexOutOfBoundsException e) {
+				while (atual >= FIRST_SEMANTIC_ACTION) {
+					//para evitar que o analisador reclame de estar procurando uma ação
+					//semântica no código, o que não é algo que o usuário final poderá encontrar
+					atual = simbolos.retirar();
+				}
 				throw new SintaticoException("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual], lex.getLinha());
 			} catch (InvalidTokenException e) {
 				//repassar a mensagem de erro do léxico, de quando um token não segue as regras da LMS
@@ -292,9 +297,16 @@ public class Sintatico {
 					throw new SintaticoException(aviso, lex.getLinha());
 				}
 			} else {
-				//eh acao semantica
-				System.out.println("Acao semantica, por enquanto ignorar");
-				simbolos.retirar();
+				if(!semantico) {
+					//é ação semântica e estamos no modo com ação semântica desabilitada 
+					System.out.println("Ação semântica, por enquanto ignorar");
+					//evitar que o token atual do código seja consumido neste passo
+					lex.retorna();
+				} else {
+					System.out.println("Tratando a ação semântica " + atual);
+					Semantico.trataAcao(atual);
+					lex.retorna();
+				}
 			}
 			System.out.println(lex.semTokens());
 		} while (!lex.semTokens());

@@ -190,7 +190,7 @@ public class Principal {
 				int linhaDoErro = -1;
 				String msgErro = "";
 				try {
-					Sintatico.analisar(shell, caixaDeCodigo.getText().trim());
+					Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), false);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -215,6 +215,41 @@ public class Principal {
 		});
 		shell.open();
 
+		Button btnSemantico = new Button(shell, SWT.NONE);
+		btnSemantico.setBounds(378, 482, 100, 36);
+		btnSemantico.setText("Semântico");
+		btnSemantico.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				//atualizar a janela de código para remover linhas que tenham sido pintadas anteriormente
+				caixaDeCodigo.setText(caixaDeCodigo.getText());
+				int linhaDoErro = -1;
+				String msgErro = "";
+				try {
+					Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), true);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					linhaDoErro = ((SintaticoException) e1).getLinha();
+					msgErro = ((SintaticoException) e1).getAviso();
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR
+							| SWT.OK);
+					messageBox.setMessage(msgErro);
+					messageBox.setText("Erro");
+					messageBox.open();
+					caixaDeCodigo.setLineBackground(linhaDoErro, 1, new Color(display, 255,127,127));
+				}
+				//informar sucesso se não foi encontrado erro
+				if (linhaDoErro == -1) {
+					MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION
+							| SWT.OK);
+					messageBox.setMessage("Arquivo processado com sucesso.");
+					messageBox.setText("Sucesso!");
+					messageBox.open();
+				}
+			}
+		});
+		shell.open();
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
