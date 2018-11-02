@@ -7,7 +7,7 @@ package hipotetica;
  * e "Hipotetica" foi criada por Maicon, Reinaldo e Fabio e adaptada
  * para este aplicativo.
  */
-class AreaLiterais{
+public class AreaLiterais{
 	public String AL[]= new String[30];
 	public int LIT;
 }

@@ -7,7 +7,7 @@ package hipotetica;
  * e "Hipotetica" foi criada por Maicon, Reinaldo e Fabio e adaptada
  * para este aplicativo.
  */
-class Tipos{
+public class Tipos{
 	public int codigo; 
 	public int op1;
 	public int op2;
@@ -16,7 +16,7 @@ class Tipos{
 	 * Construtor sem parâmetros.
 	 * Todos os atributos são inicializados com valores padrões.
 	 */
-	Tipos(){
+	public Tipos(){
 		codigo=0;
 		op1=0;
 		op2=0;

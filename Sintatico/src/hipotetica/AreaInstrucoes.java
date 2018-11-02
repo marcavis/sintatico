@@ -9,7 +9,7 @@ package hipotetica;
  * e "Hipotetica" foi criada por Maicon, Reinaldo e Fabio e adaptada
  * para este aplicativo.
  */
-class AreaInstrucoes{
+public class AreaInstrucoes{
 	public Tipos AI[]= new Tipos[1000];
 	public int LC;
 
@@ -17,7 +17,7 @@ class AreaInstrucoes{
 	 * Construtor sem parâmetros.
 	 * Todos os atributos são inicializados com valores padrões.
 	 */
-	AreaInstrucoes(){
+	public AreaInstrucoes(){
 		for(int i=0; i<1000; i++){
 			AI[i]=new Tipos();
 		}

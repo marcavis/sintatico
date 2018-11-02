@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * e "AreaLiterais" foi criada por Maicon, Reinaldo e Fabio e adaptada
  * para este aplicativo.
  */
-class Hipotetica{
+public class Hipotetica{
 	public static int MaxInst=1000;
 	public static int MaxList=30;
 	public static int b; //base do segmento
