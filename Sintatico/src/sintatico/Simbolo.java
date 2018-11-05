@@ -27,6 +27,12 @@ public class Simbolo {
 		this.geralA = geralA;
 	}
 	
+	public Simbolo(String nome, Categoria categoria, int nivel) {
+		this.nome = nome;
+		this.categoria = categoria;
+		this.nivel = nivel;
+	}
+
 	public String getNome() {
 		return nome;
 	}

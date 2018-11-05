@@ -6,6 +6,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import hipotetica.Tipos;
+
 public class Sintatico {
 	static int EPSILON = 0;
 	static int DOLLAR = 1;
@@ -212,6 +214,8 @@ public class Sintatico {
     }
 	
 	public static void analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
+		String penultimoLexema = ""; //acoes semanticas podem precisar voltar atrás no código fonte
+		//para acessar identificadores depois de o léxico já ter avançado
 		char[] fonte = new char[codigoFonte.length()];
 		
 		for (int i = 0; i < codigoFonte.length(); i++) {
@@ -298,21 +302,28 @@ public class Sintatico {
 				}
 			} else {
 				if(!semantico) {
+					lex.retorna();
 					//é ação semântica e estamos no modo com ação semântica desabilitada 
 					System.out.println("Ação semântica, por enquanto ignorar");
 					//evitar que o token atual do código seja consumido neste passo
-					lex.retorna();
 				} else {
-					System.out.println("Tratando a ação semântica " + atual);
-					Semantico.trataAcao(atual);
 					lex.retorna();
+					System.out.println("Tratando a ação semântica " + atual);
+					Semantico.trataAcao(atual, lex.getLinha(), penultimoLexema);
 				}
 			}
 			System.out.println(lex.semTokens());
+			penultimoLexema = lex.getUltimoLexema();
 		} while (!lex.semTokens());
 		System.out.println("Arquivo processado com sucesso.");
 		//debug, mostra que apenas o $ localiza-se na pilha
 		System.out.println(simbolos);
+		if(semantico) {
+			for (Tipos t : Semantico.areaInstrucoes.AI) {
+				if (t.codigo == -1) {break;}
+				System.out.println(Semantico.legenda[t.codigo] + ", " + t.op1 + ", " + t.op2);
+			}
+		}
 	}
 	
 }

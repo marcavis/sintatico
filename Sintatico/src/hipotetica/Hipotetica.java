@@ -68,7 +68,7 @@ public class Hipotetica{
 	 * Inclui uma instrução na área de instruções utilizada pela máquina
 	 * hipotética.
 	 */
-	public boolean IncluirAI(AreaInstrucoes AI, int c, int o1, int o2) {
+	public static boolean IncluirAI(AreaInstrucoes AI, int c, int o1, int o2) {
 		boolean aux;
 		if(AI.LC>=MaxInst)
 		{
