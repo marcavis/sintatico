@@ -315,14 +315,25 @@ public class Sintatico {
 			System.out.println(lex.semTokens());
 			penultimoLexema = lex.getUltimoLexema();
 		} while (!lex.semTokens());
-		//tratar a última ação semântica, que é executada 
+		//tratar (ou ignorar) a última ação semântica, que é executada após todo o fonte ser lido:
+		int atual = simbolos.retirar();
+		if(semantico) {
+			System.out.println("Tratando a ação semântica " + atual);
+			Semantico.trataAcao(atual, lex.getLinha(), penultimoLexema);
+		}
+		//verificar que sobrou apenas o $ na pilha de expansão
+		if(simbolos.tamanho() > 1) {
+			throw new SintaticoException("Erro: fim de arquivo encontrado quando se esperava " + LEGENDA[atual], lex.getLinha());
+		}
+		
 		System.out.println("Arquivo processado com sucesso.");
-		//debug, mostra que apenas o $ localiza-se na pilha
-		System.out.println("Símbolos:" + simbolos);
+
 		if(semantico) {
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
 				if (t.codigo == -1) {break;}
-				System.out.println(Semantico.legenda[t.codigo] + ", " + t.op1 + ", " + t.op2);
+				String op1 = t.op1 >= 0? "" + t.op1 : "--";
+				String op2 = t.op2 >= 0? "" + t.op2 : "--";
+				System.out.println(Semantico.legenda[t.codigo] + ", " + op1 + ", " + op2);
 			}
 		}
 	}

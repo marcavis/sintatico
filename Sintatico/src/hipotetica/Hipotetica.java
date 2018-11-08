@@ -171,7 +171,7 @@ public class Hipotetica{
 			switch (operador){
 			case 1://RETU
 				p=S[b+2];
-				topo=b-a;
+				topo=b-a-1;
 				b=S[b+1];
 				break;
 
