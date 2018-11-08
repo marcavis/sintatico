@@ -315,9 +315,10 @@ public class Sintatico {
 			System.out.println(lex.semTokens());
 			penultimoLexema = lex.getUltimoLexema();
 		} while (!lex.semTokens());
+		//tratar a última ação semântica, que é executada 
 		System.out.println("Arquivo processado com sucesso.");
 		//debug, mostra que apenas o $ localiza-se na pilha
-		System.out.println(simbolos);
+		System.out.println("Símbolos:" + simbolos);
 		if(semantico) {
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
 				if (t.codigo == -1) {break;}

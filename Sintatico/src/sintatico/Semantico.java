@@ -75,6 +75,7 @@ public class Semantico {
 	
 	public static void trataAcao(int atual, int linha, String nome) throws SintaticoException {
 		Simbolo s = new Simbolo("");
+		System.out.println(atual);
 		switch (atual) {
 		case 100:
 			//inic pilhas
