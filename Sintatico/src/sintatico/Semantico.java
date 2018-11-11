@@ -265,6 +265,7 @@ public class Semantico {
 			retorno = simbolos.inserir(new Simbolo(novoNome, s.getCategoria(), s.getNivel(), s.getGeralA(), s.getGeralB()));
 			sufixo++;
 		}
+		simbolos.inserirConversao(novoNome, nivelAtual);
 		return novoNome;
 	}
 }

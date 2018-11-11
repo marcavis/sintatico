@@ -1,11 +1,16 @@
 package sintatico;
 
+import java.util.ArrayList;
+
 public class Hash {
 	private NodeSimbolo[] lista;
+	private ArrayList<String>[] conversoes;
 	private int tamanho;
 	
+	@SuppressWarnings("unchecked")
 	public Hash(int tamanhoInformado) {
 		tamanho = tamanhoCerto(tamanhoInformado);
+		conversoes = new ArrayList[100];
 		lista = new NodeSimbolo[tamanho];
 	}
 	
@@ -38,6 +43,15 @@ public class Hash {
 			return hash;
 		}
 		return hash;
+	}
+	
+	//chamado pelo semântico quando um símbolo for gerado através de conversão alfa
+	public void inserirConversao(String nome, int nivel) {
+		if(conversoes[nivel] == null) {
+			conversoes[nivel] = new ArrayList<String>();
+		}
+		conversoes[nivel].add(nome);
+		System.out.println(nome);
 	}
 	
 	//retorna o código hash calculado
@@ -85,6 +99,35 @@ public class Hash {
 	//função que remove um símbolo precisando apenas do nome dele
 	public int remover(String nome) {
 		return remover(new Simbolo(nome, Categoria.VAR, 0, 0));
+	}
+	
+	//remove todos os símbolos de um nível 'n', retornando a quantidade
+	//de remoções
+	public int removerEscopo(int n) {
+		int remocoes = 0;
+		//adicionar numa lista antes de remover para não confundir loops de remoção
+		ArrayList<String> nomesARemover = new ArrayList<String>();
+
+		for (int i = 0; i < lista.length; i++) {
+			NodeSimbolo cursor = lista[i];
+			//na maioria dos casos, o cursor SERÁ nulo, logo pularemos
+			//essa célula do hash
+			while (cursor != null) {
+				if(cursor.valor.getNivel() == n) {
+					nomesARemover.add(cursor.valor.getNome());
+				}
+				cursor = cursor.next;
+			}
+		}
+		
+		for (String nome : nomesARemover) {
+			remover(nome);
+			remocoes++;
+		}
+		
+		//remover toda informação de que existem conversões alfa da tabela de conversões 
+		conversoes[n] = null;
+		return remocoes;
 	}
 	
 	public Simbolo buscar(String nome) throws Exception {

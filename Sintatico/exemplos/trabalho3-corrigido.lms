@@ -1,0 +1,33 @@
+Program ProgramaTrabalho3;
+Const maxCont = 10;
+Var x,cont,soma: Integer;
+(* ponto 1 *)
+Procedure imprime(y: integer);
+	var i : integer;
+		Procedure exibe;
+		var i : integer;
+		begin
+			for i := 1 to 3 do
+				Writeln("TEXTO");
+			soma := soma + 1;
+		end;
+	begin
+		for i := 1 to y do
+			call exibe; (*chama procedure local “y” vezes*)
+		(* ponto 2 *)
+	end;
+Begin
+	Writeln("Iniciando programa...");
+	Writeln("Informe o nr. de repetições:");
+	Readln(x);
+	cont := 0;
+	soma := 0;
+(* ponto 3 *)
+	Repeat
+	begin
+		cont := cont + 1;
+		call imprime(x);
+	end
+	Until cont >= maxCont;
+	Writeln("Soma global das repetições: ", soma);
+End.
