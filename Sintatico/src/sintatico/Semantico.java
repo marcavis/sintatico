@@ -22,12 +22,13 @@ public class Semantico {
 	static int nivelId = 0;
 	static int deslocamentoId = 0;
 	static int contexto = 0;
+	static String idDaProc = "";
 	
 	static PilhaDinamica<Integer> pilhaIf = new PilhaDinamica<Integer>();
 	
-	//contextos para readln/writeln
+	//contextos para readln ou expressao
 	static int C_READLN = 1;
-	static int C_WRITELN = 2;
+	static int C_EXPRESSAO = 2;
 	
 	static int RETU = 1;
 	static int CRVL = 2;
@@ -96,6 +97,7 @@ public class Semantico {
 			break;
 		case 102:
 			incluiInstrucao(AMEM, -1, numVariaveis + 3);
+			numVariaveis = 0;
 			break;
 		//case 103: nao existe mais,
 		//	break;
@@ -178,8 +180,11 @@ public class Semantico {
 			numParametros = 0;
 			simbolos.inserir(new Simbolo(nome, Categoria.PROC, nivelAtual));
 			nivelAtual++;
+			idDaProc = nome;
 			break;
 		case 109:
+			System.out.println(nome);
+			//TODO
 			break;
 		case 110:
 			break;
@@ -193,6 +198,7 @@ public class Semantico {
 		//	break;
 		case 114:
 			try {
+				System.out.println(simbolos);
 				s = simbolos.buscar(nome);
 			} catch (Exception e) {
 				System.out.println("erroaqui?" + nome);
@@ -232,6 +238,87 @@ public class Semantico {
 			break;
 		case 129:
 			
+			break;
+		case 130:
+			
+			break;
+		case 131:
+			
+			break;
+		case 132:
+			
+			break;
+		case 133:
+			
+			break;
+		case 134:
+			
+			break;
+		case 135:
+			
+			break;
+		case 136:
+			
+			break;
+		case 137:
+			
+			break;
+		case 138:
+			
+			break;
+		case 139:
+			
+			break;
+		case 140:
+			//TODO
+			break;
+		case 141:
+			incluiInstrucao(CMIG, -1, -1);
+			break;
+		case 142:
+			incluiInstrucao(CMME, -1, -1);
+			break;
+		case 143:
+			incluiInstrucao(CMMA, -1, -1);
+			break;
+		case 144:
+			incluiInstrucao(CMAI, -1, -1);
+			break;
+		case 145:
+			incluiInstrucao(CMEI, -1, -1);
+			break;
+		case 146:
+			incluiInstrucao(CMDF, -1, -1);
+			break;
+		case 147:
+			incluiInstrucao(INVR, -1, -1);
+			break;
+		case 148:
+			incluiInstrucao(SOMA, -1, -1);
+			break;
+		case 149:
+			incluiInstrucao(SUBT, -1, -1);
+			break;
+		case 150:
+			incluiInstrucao(DISJ, -1, -1);
+			break;
+		case 151:
+			incluiInstrucao(MULT, -1, -1);
+			break;
+		case 152:
+			incluiInstrucao(DIVI, -1, -1);
+			break;
+		case 153:
+			incluiInstrucao(CONJ, -1, -1);
+			break;
+		case 154:
+			incluiInstrucao(CRCT, -1, Integer.parseInt(nome));
+			break;
+		case 155:
+			incluiInstrucao(NEGA, -1, -1);
+			break;
+		case 156:
+			contexto = C_EXPRESSAO;
 			break;
 		default:
 			//TODO = comando não existe

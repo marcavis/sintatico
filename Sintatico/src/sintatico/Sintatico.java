@@ -329,11 +329,13 @@ public class Sintatico {
 		System.out.println("Arquivo processado com sucesso.");
 
 		if(semantico) {
+			int i = 0;
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
 				if (t.codigo == -1) {break;}
 				String op1 = t.op1 >= 0? "" + t.op1 : "--";
 				String op2 = t.op2 >= 0? "" + t.op2 : "--";
-				System.out.println(Semantico.legenda[t.codigo] + ", " + op1 + ", " + op2);
+				System.out.println("" + i + " " + Semantico.legenda[t.codigo] + ", " + op1 + ", " + op2);
+				i++;
 			}
 		}
 	}

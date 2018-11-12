@@ -31,7 +31,7 @@ public class Hash {
 			NodeSimbolo anterior = lista[hash];
 			while(atual != null) {
 				String nomeAtual = atual.valor.getNome();
-				if(nomeAtual.equals(s.getNome())) {
+				if(nomeAtual.toLowerCase().equals(s.getNome().toLowerCase())) {
 					//já existe na tabela
 					return -1;
 				}
@@ -64,7 +64,7 @@ public class Hash {
 		//existe apenas um item nessa posição, podemos anula-la...
 		//se for o símbolo que procuramos
 		if(lista[hash].next == null) {
-			if(s.getNome().equals(lista[hash].valor.getNome())) {
+			if(s.getNome().toLowerCase().equals(lista[hash].valor.getNome().toLowerCase())) {
 				lista[hash] = null;
 				return hash;
 			}
@@ -73,7 +73,7 @@ public class Hash {
 		} else {
 			//existe mais de um item na posição
 			//se for o primeiro, basta mover o segundo item para a primeira posição
-			if(s.getNome().equals(lista[hash].valor.getNome())) {
+			if(s.getNome().toLowerCase().equals(lista[hash].valor.getNome().toLowerCase())) {
 				lista[hash] = lista[hash].next;
 				return hash;
 			}
@@ -83,7 +83,7 @@ public class Hash {
 			NodeSimbolo anterior = lista[hash];
 			while(atual != null) {
 				String nomeAtual = atual.valor.getNome();
-				if(nomeAtual.equals(lista[hash].valor.getNome())) {
+				if(nomeAtual.toLowerCase().equals(lista[hash].valor.getNome().toLowerCase())) {
 					anterior.next = anterior.next.next;
 					atual = null;
 					return hash;
@@ -134,7 +134,7 @@ public class Hash {
 		int hash = horner(nome);
 		NodeSimbolo atual = lista[hash];
 		while (atual != null) {
-			if(atual.valor.getNome().equals(nome)) {
+			if(atual.valor.getNome().toLowerCase().equals(nome.toLowerCase())) {
 				return lista[hash].valor;
 			}
 			atual = atual.next;
@@ -171,7 +171,10 @@ public class Hash {
 		return atualizar(new Simbolo(nome, cat, nivel, geralA));
 	}
 	
-	public int horner(String string) {
+	public int horner(String entrada) {
+		//padronizar todos os hashes para usarem uma mesma capitalização,
+		//afinal a linguagem usada é case-insensitive
+		String string = entrada.toLowerCase();
 		if(string.length() == 0) {
 			return 0;
 		}
