@@ -25,6 +25,7 @@ public class Semantico {
 	static String idDaProc = "";
 	
 	static PilhaDinamica<Integer> pilhaIf = new PilhaDinamica<Integer>();
+	static PilhaDinamica<String> pilhaPar = new PilhaDinamica<String>();
 	
 	//contextos para readln ou expressao
 	static int C_READLN = 1;
@@ -123,6 +124,7 @@ public class Semantico {
 				}
 				numVariaveis++;
 			} else if (tipoId == PAR) {
+				String nomeUsado = nome;
 				int retorno = simbolos.inserir(new Simbolo(nome, Categoria.PAR, nivelAtual));
 				if(retorno == -1) {
 					Simbolo existente = new Simbolo("");
@@ -135,8 +137,9 @@ public class Semantico {
 					}
 					//já existe mas foi declarado em um escopo diferente, então podemos
 					//inserir um símbolo novo com um nome diferente
-					conversaoAlfa(new Simbolo(nome, Categoria.PAR, nivelAtual));
+					nomeUsado = conversaoAlfa(new Simbolo(nome, Categoria.PAR, nivelAtual));
 				}
+				pilhaPar.inserir(nomeUsado);
 				numParametros++;
 			} else {
 				throw new SintaticoException("Tipo de identificador desconhecido", linha);
@@ -184,7 +187,31 @@ public class Semantico {
 			break;
 		case 109:
 			System.out.println(nome);
+			try {
+				s = simbolos.buscar(idDaProc);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			simbolos.atualizar(idDaProc, s.getCategoria(), s.getNivel(), s.getGeralA(), numParametros);
+			int i = 0;
+			while(pilhaPar.tamanho() > 0) {
+				String par = pilhaPar.retirar();
+				try {
+					s = simbolos.buscar(par);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				simbolos.atualizar(par, s.getCategoria(), s.getNivel(), i - numParametros, s.getGeralB());
+				try {
+					System.out.println(simbolos.buscar(par));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				i++;
+			}
 			//TODO
+			//System.exit(0);
 			break;
 		case 110:
 			break;
@@ -211,7 +238,8 @@ public class Semantico {
 			deslocamentoId = s.getGeralA();
 			break;
 		case 115:
-			incluiInstrucao(ARMZ, nivelId, deslocamentoId);
+			incluiInstrucao(ARMZ, nivelAtual - nivelId, deslocamentoId);
+			System.out.println("ARMZ " + (nivelAtual - nivelId) + ", " + deslocamentoId + ", " + idDaAtribuicao );
 			break;
 		case 116:
 			break;
