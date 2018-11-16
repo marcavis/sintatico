@@ -19,6 +19,10 @@ public class Semantico {
 	static String enderecoConst = "";
 	static boolean houveParametro;
 	static String idDaAtribuicao = "";
+	static int enderecoCall = -1;
+	static int parametrosEsperadosCall = 0;
+	static int numParametrosEfetivos = 0; //quantos parâmetros estão sendo usados nesta chamada de função
+	static String nomeProc = "";
 	static int nivelId = 0;
 	static int deslocamentoId = 0;
 	static int contexto = 0;
@@ -26,6 +30,8 @@ public class Semantico {
 	
 	static PilhaDinamica<Integer> pilhaIf = new PilhaDinamica<Integer>();
 	static PilhaDinamica<String> pilhaPar = new PilhaDinamica<String>();
+	static PilhaDinamica<Integer> pilhaNumPar = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaDesvios = new PilhaDinamica<Integer>();
 	
 	//contextos para readln ou expressao
 	static int C_READLN = 1;
@@ -135,8 +141,6 @@ public class Semantico {
 					if(existente.getNivel() == nivelAtual) {
 						throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
 					}
-					//já existe mas foi declarado em um escopo diferente, então podemos
-					//inserir um símbolo novo com um nome diferente
 					nomeUsado = conversaoAlfa(new Simbolo(nome, Categoria.PAR, nivelAtual));
 				}
 				pilhaPar.inserir(nomeUsado);
@@ -210,10 +214,16 @@ public class Semantico {
 				}
 				i++;
 			}
-			//TODO
+			pilhaNumPar.inserir(numParametros);
+			pilhaDesvios.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVS, -1, -1);
 			//System.exit(0);
 			break;
 		case 110:
+			incluiInstrucao(RETU, -1, pilhaNumPar.retirar());
+			alteraInstrucao(pilhaDesvios.retirar(), -1, areaInstrucoes.LC);
+			simbolos.removerEscopo(nivelAtual);
+			nivelAtual--;
 			break;
 		case 111:
 			houveParametro = true;
@@ -225,7 +235,6 @@ public class Semantico {
 		//	break;
 		case 114:
 			try {
-				System.out.println(simbolos);
 				s = simbolos.buscar(nome);
 			} catch (Exception e) {
 				System.out.println("erroaqui?" + nome);
@@ -242,10 +251,27 @@ public class Semantico {
 			System.out.println("ARMZ " + (nivelAtual - nivelId) + ", " + deslocamentoId + ", " + idDaAtribuicao );
 			break;
 		case 116:
+			try{
+				s = simbolos.buscar(nome);
+			} catch (Exception e) {
+				throw new SintaticoException("Procedure " + nome + " não localizada", linha);
+			}
+			if (s.getCategoria() != Categoria.PROC) {
+				throw new SintaticoException("Símbolo " + nome + " não é procedure", linha);
+			}
+			enderecoCall = s.getGeralA();
+			parametrosEsperadosCall = s.getGeralB();
+			nomeProc = nome;
 			break;
 		case 117:
+			if(numParametrosEfetivos != parametrosEsperadosCall) {
+				throw new SintaticoException("Tentativa de chamar " + nomeProc + " com número incorreto de parâmetros", linha);
+			}
+			incluiInstrucao(CALL, 0, enderecoCall);
+			numParametrosEfetivos = 0;
 			break;
 		case 118:
+			numParametrosEfetivos++;
 			break;
 		case 120:
 			pilhaIf.inserir(areaInstrucoes.LC);
@@ -383,4 +409,22 @@ public class Semantico {
 		simbolos.inserirConversao(novoNome, nivelAtual);
 		return novoNome;
 	}
+	
+//	public static void inserirTS(String nome, Categoria cat, int linha) {
+//		int retorno = simbolos.inserir(new Simbolo(nome, cat, nivelAtual, deslocamento + numVariaveis));
+//		if(retorno == -1) {
+//			//símbolo com esse nome já existe
+//			Simbolo existente = new Simbolo("");
+//			try {
+//				existente = simbolos.buscar(nome);
+//			} catch (Exception e) { //não acontecerá, pois a falha na inclusão indica que o símbolo existe
+//			}
+//			if(existente.getNivel() == nivelAtual) {
+//				throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
+//			}
+//			//já existe mas foi declarado em um escopo diferente, então podemos
+//			//inserir um símbolo novo com um nome diferente
+//			conversaoAlfa(new Simbolo(nome, cat, nivelAtual, deslocamento + numVariaveis));
+//		}
+//	}
 }

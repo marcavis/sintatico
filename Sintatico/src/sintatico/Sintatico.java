@@ -338,6 +338,8 @@ public class Sintatico {
 				i++;
 			}
 		}
+		
+		System.out.println(Semantico.simbolos);
 	}
 	
 }
