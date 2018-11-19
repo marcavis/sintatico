@@ -1,0 +1,26 @@
+Program teste7;
+Const x = 75;
+Var a,b,c,i:integer;
+Begin
+	Readln(a,b);
+	Readln(i);
+	c:=0;
+	Case i of
+		1,4: begin
+			for a:=3 to 30 do
+				c := c + a;
+			end;
+		2,3,5 : c:=a-b;
+		11: begin
+			c:=x;
+			Writeln("c = ",c);
+		end
+	End;
+	if a > b then
+		Writeln("A era MAIOR do que ")
+	else if a < b then
+		Writeln("A era MENOR do que B ")
+	else
+		Writeln("A era IGUAL a ");
+	Writeln("Fim do programa ");
+End.

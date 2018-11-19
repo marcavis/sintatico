@@ -29,9 +29,14 @@ public class Semantico {
 	static String idDaProc = "";
 	
 	static PilhaDinamica<Integer> pilhaIf = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaFor = new PilhaDinamica<Integer>();
+	static PilhaDinamica<String> pilhaVarControleFor = new PilhaDinamica<String>();
+	static PilhaDinamica<Integer> pilhaSaidaFor = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaWhile = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaRepeat = new PilhaDinamica<Integer>();
 	static PilhaDinamica<String> pilhaPar = new PilhaDinamica<String>();
 	static PilhaDinamica<Integer> pilhaNumPar = new PilhaDinamica<Integer>();
-	static PilhaDinamica<Integer> pilhaDesvios = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaDesvios = new PilhaDinamica<Integer>(); //usada para desvios de procedures
 	
 	//contextos para readln ou expressao
 	static int C_READLN = 1;
@@ -286,45 +291,108 @@ public class Semantico {
 			incluiInstrucao(DSVS, -1, -1);
 			break;
 		case 123:
+			//endereço de retorno do while
+			pilhaWhile.inserir(areaInstrucoes.LC);
+			break;
+		case 124:
+			//endereço do desvio de saída do while
+			pilhaWhile.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVF, -1, -1);
+			break;
+		case 125:
+			alteraInstrucao((int) pilhaWhile.retirar(), -1, areaInstrucoes.LC + 1);
+			incluiInstrucao(DSVS, -1, pilhaWhile.retirar());
+			break;
+		case 126:
+			pilhaRepeat.inserir(areaInstrucoes.LC);
+			break;
+		case 127:
+			incluiInstrucao(DSVF, -1, pilhaRepeat.retirar());
 			break;
 		case 128:
 			contexto = C_READLN;
 			break;
 		case 129:
-			
+			try {
+				s = simbolos.buscar(nome);
+			} catch (Exception e) {
+				throw new SintaticoException("Identificador " + nome + " não localizado", linha);
+			}
+			System.out.println(s.getCategoria());
+			if(contexto == C_READLN) {
+				if (s.getCategoria() != Categoria.VAR) {
+					throw new SintaticoException("Símbolo " + nome + " não é variável", linha);
+				}
+				incluiInstrucao(LEIT, -1, -1);
+				incluiInstrucao(ARMZ, nivelAtual - nivelId, deslocamentoId);
+			} else {
+				//contexto eh expressão
+				if (s.getCategoria() == Categoria.VAR || s.getCategoria() == Categoria.PAR) {
+					incluiInstrucao(CRVL, nivelAtual - nivelId, deslocamentoId);
+				} else if (s.getCategoria() == Categoria.CONST) {
+					incluiInstrucao(CRCT, -1, s.getGeralA());
+				} else {
+					throw new SintaticoException("Símbolo " + nome + " não é variável nem constante", linha);
+				}
+				
+			}
 			break;
 		case 130:
-			
+			incluiInstrucao(IMPRL, -1, areaLiterais.LIT);
+			Hipotetica.IncluirAL(areaLiterais, nome.substring(1, nome.length() - 1));
 			break;
 		case 131:
-			
+			incluiInstrucao(IMPR, -1, -1);
 			break;
 		case 132:
-			
+			//TODO
 			break;
 		case 133:
-			
+			//TODO
 			break;
 		case 134:
-			
+			//TODO
 			break;
 		case 135:
-			
+			//TODO
 			break;
 		case 136:
-			
+			//TODO
 			break;
 		case 137:
-			
+			try {
+				s = simbolos.buscar(nome);
+			} catch (Exception e) {
+				throw new SintaticoException("Identificador " + nome + " não localizado", linha);
+			}
+			nivelId = s.getNivel();
+			deslocamentoId = s.getGeralA();
+			pilhaVarControleFor.inserir(nome);
 			break;
 		case 138:
-			
+			incluiInstrucao(ARMZ, nivelAtual - nivelId, deslocamentoId);
 			break;
 		case 139:
-			
+			pilhaFor.inserir(areaInstrucoes.LC);
+			incluiInstrucao(COPI, -1, -1);
+			incluiInstrucao(CRVL, nivelAtual - nivelId, deslocamentoId);
+			incluiInstrucao(CMAI, -1, -1);
+			pilhaSaidaFor.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVF, -1, -1);
 			break;
 		case 140:
-			//TODO
+			try {
+				s = simbolos.buscar(pilhaVarControleFor.retirar());
+			} catch (Exception e) {
+				throw new SintaticoException("Identificador " + nome + " não localizado", linha);
+			}
+			incluiInstrucao(CRVL, nivelAtual - s.getNivel(), s.getGeralA());
+			incluiInstrucao(CRCT, -1, 1);
+			incluiInstrucao(SOMA, -1, -1);
+			incluiInstrucao(ARMZ, nivelAtual - s.getNivel(), s.getGeralA());
+			alteraInstrucao(pilhaSaidaFor.retirar(), -1, areaInstrucoes.LC + 1);
+			incluiInstrucao(DSVS, -1, pilhaFor.retirar());
+			incluiInstrucao(AMEM, -1, -1);
 			break;
 		case 141:
 			incluiInstrucao(CMIG, -1, -1);
