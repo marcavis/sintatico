@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 public class Hash {
 	private NodeSimbolo[] lista;
-	private ArrayList<String>[] conversoes;
 	private int tamanho;
 	
 	@SuppressWarnings("unchecked")
 	public Hash(int tamanhoInformado) {
 		tamanho = tamanhoCerto(tamanhoInformado);
-		conversoes = new ArrayList[100];
 		lista = new NodeSimbolo[tamanho];
 	}
 	
@@ -43,15 +41,6 @@ public class Hash {
 			return hash;
 		}
 		return hash;
-	}
-	
-	//chamado pelo semântico quando um símbolo for gerado através de conversão alfa
-	public void inserirConversao(String nome, int nivel) {
-		if(conversoes[nivel] == null) {
-			conversoes[nivel] = new ArrayList<String>();
-		}
-		conversoes[nivel].add(nome);
-		System.out.println(nome);
 	}
 	
 	//retorna o código hash calculado
@@ -124,9 +113,6 @@ public class Hash {
 			remover(nome);
 			remocoes++;
 		}
-		
-		//remover toda informação de que existem conversões alfa da tabela de conversões 
-		conversoes[n] = null;
 		return remocoes;
 	}
 	

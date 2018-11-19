@@ -331,6 +331,7 @@ public class Sintatico {
 		if(semantico) {
 			int i = 0;
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
+				if (i == 0) {i++; continue;} //pular a primeira instrução, que é vazia
 				if (t.codigo == -1) {break;}
 				String op1 = t.op1 >= 0? "" + t.op1 : "--";
 				String op2 = t.op2 >= 0? "" + t.op2 : "--";

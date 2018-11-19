@@ -101,8 +101,8 @@ public class Semantico {
 			ponteiroLivre = 1;
 			numVariaveis = 0;
 			deslocamento = 3;
-			lc = 1;
-			lit = 1;
+			areaInstrucoes.LC = 1;
+			areaLiterais.LIT = 1;
 			break;
 		case 101:
 			incluiInstrucao(PARA);
@@ -128,10 +128,10 @@ public class Semantico {
 					}
 					if(existente.getNivel() == nivelAtual) {
 						throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
+					} else {
+						//desistimos de implementar conversão alfa
+						throw new SintaticoException("Símbolo " + nome + " já foi definido na tabela em um escopo superior;\nescolha outro nome para o identificador.", linha);
 					}
-					//já existe mas foi declarado em um escopo diferente, então podemos
-					//inserir um símbolo novo com um nome diferente
-					conversaoAlfa(new Simbolo(nome, Categoria.VAR, nivelAtual, deslocamento + numVariaveis));
 				}
 				numVariaveis++;
 			} else if (tipoId == PAR) {
@@ -145,8 +145,10 @@ public class Semantico {
 					}
 					if(existente.getNivel() == nivelAtual) {
 						throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
+					} else {
+						//desistimos de implementar conversão alfa
+						throw new SintaticoException("Símbolo " + nome + " já foi definido na tabela em um escopo superior;\nescolha outro nome para o identificador.", linha);
 					}
-					nomeUsado = conversaoAlfa(new Simbolo(nome, Categoria.PAR, nivelAtual));
 				}
 				pilhaPar.inserir(nomeUsado);
 				numParametros++;
@@ -167,10 +169,10 @@ public class Semantico {
 				}
 				if(existente.getNivel() == nivelAtual) {
 					throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
+				} else {
+					//desistimos de implementar conversão alfa
+					throw new SintaticoException("Símbolo " + nome + " já foi definido na tabela em um escopo superior;\nescolha outro nome para o identificador.", linha);
 				}
-				//já existe mas foi declarado em um escopo diferente, então podemos
-				//inserir um símbolo novo com um nome diferente
-				nomeConst = conversaoAlfa(new Simbolo(nome, Categoria.CONST, nivelAtual));
 			}
 			enderecoConst = nomeConst;
 			break;
@@ -190,7 +192,7 @@ public class Semantico {
 			
 			houveParametro = false;
 			numParametros = 0;
-			simbolos.inserir(new Simbolo(nome, Categoria.PROC, nivelAtual));
+			simbolos.inserir(new Simbolo(nome, Categoria.PROC, nivelAtual, -1, -1));
 			nivelAtual++;
 			idDaProc = nome;
 			break;
@@ -201,7 +203,7 @@ public class Semantico {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			simbolos.atualizar(idDaProc, s.getCategoria(), s.getNivel(), s.getGeralA(), numParametros);
+			simbolos.atualizar(idDaProc, s.getCategoria(), s.getNivel(), areaInstrucoes.LC + 1, numParametros);
 			int i = 0;
 			while(pilhaPar.tamanho() > 0) {
 				String par = pilhaPar.retirar();
@@ -227,6 +229,7 @@ public class Semantico {
 		case 110:
 			incluiInstrucao(RETU, -1, pilhaNumPar.retirar());
 			alteraInstrucao(pilhaDesvios.retirar(), -1, areaInstrucoes.LC);
+			
 			simbolos.removerEscopo(nivelAtual);
 			nivelAtual--;
 			break;
@@ -265,6 +268,7 @@ public class Semantico {
 				throw new SintaticoException("Símbolo " + nome + " não é procedure", linha);
 			}
 			enderecoCall = s.getGeralA();
+			System.out.println(enderecoCall);
 			parametrosEsperadosCall = s.getGeralB();
 			nomeProc = nome;
 			break;
@@ -324,11 +328,11 @@ public class Semantico {
 					throw new SintaticoException("Símbolo " + nome + " não é variável", linha);
 				}
 				incluiInstrucao(LEIT, -1, -1);
-				incluiInstrucao(ARMZ, nivelAtual - nivelId, deslocamentoId);
+				incluiInstrucao(ARMZ, nivelAtual - s.getNivel(), s.getGeralA());
 			} else {
 				//contexto eh expressão
 				if (s.getCategoria() == Categoria.VAR || s.getCategoria() == Categoria.PAR) {
-					incluiInstrucao(CRVL, nivelAtual - nivelId, deslocamentoId);
+					incluiInstrucao(CRVL, nivelAtual - s.getNivel(), s.getGeralA());
 				} else if (s.getCategoria() == Categoria.CONST) {
 					incluiInstrucao(CRCT, -1, s.getGeralA());
 				} else {
@@ -459,23 +463,6 @@ public class Semantico {
 	
 	public static void alteraInstrucao(int indice, int op1, int op2) {
 		Hipotetica.AlterarAI(areaInstrucoes, indice, op1, op2);
-	}
-	
-	//insere um novo símbolo com o nome desejado sufixado de algum número para não haver
-	//colisão de identificadores
-	public static String conversaoAlfa(Simbolo s) {
-		int sufixo = 1;
-		int retorno = -1;
-		String nomeAntigo = s.getNome();
-		String novoNome = "";
-		while (retorno == -1) {
-			novoNome = nomeAntigo + sufixo;
-			//se houver colisão, tentaremos de novo com um sufixo diferente
-			retorno = simbolos.inserir(new Simbolo(novoNome, s.getCategoria(), s.getNivel(), s.getGeralA(), s.getGeralB()));
-			sufixo++;
-		}
-		simbolos.inserirConversao(novoNome, nivelAtual);
-		return novoNome;
 	}
 	
 //	public static void inserirTS(String nome, Categoria cat, int linha) {
