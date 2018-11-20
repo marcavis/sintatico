@@ -20,6 +20,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
+import hipotetica.AreaInstrucoes;
+import hipotetica.Tipos;
+
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
@@ -147,7 +151,7 @@ public class Principal {
 				}
 				
 				Shell shellTabela = new Shell(display);
-				shellTabela.setSize(400, 300);
+				shellTabela.setSize(400, 600);
 				
 				Table tabela = new Table(shellTabela, SWT.BORDER | SWT.V_SCROLL
 						| SWT.H_SCROLL);
@@ -164,7 +168,7 @@ public class Principal {
 				}
 				tabela.setHeaderVisible(true);
 				tabela.setLinesVisible(true);
-				tabela.setBounds(20, 20, 360, 200);
+				tabela.setBounds(20, 20, 360, 500);
 				tabela.getColumn(0).pack();
 				tabela.getColumn(1).pack();
 				tabela.getColumn(2).pack();
@@ -224,8 +228,9 @@ public class Principal {
 				caixaDeCodigo.setText(caixaDeCodigo.getText());
 				int linhaDoErro = -1;
 				String msgErro = "";
+				AreaInstrucoes ai = new AreaInstrucoes();
 				try {
-					Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), true);
+					ai = Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), true);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -246,6 +251,33 @@ public class Principal {
 					messageBox.setText("Sucesso!");
 					messageBox.open();
 				}
+				
+				Shell shellInstruc = new Shell(display);
+				shellInstruc.setSize(400, 600);
+				
+				Table tabela = new Table(shellInstruc, SWT.BORDER | SWT.V_SCROLL
+						| SWT.H_SCROLL);
+				
+				String[] titulos = { "Pos.", "Instrução", "OP1", "OP2" };
+				for (int i = 0; i < titulos.length; i++) {
+					TableColumn column = new TableColumn(tabela, SWT.NONE);
+					column.setText(titulos[i]);
+				}
+				for (int linha = 1; linha < ai.LC; linha++) {
+					TableItem esteToken = new TableItem(tabela, SWT.NONE);
+					Tipos estaLinha = ai.AI[linha]; 
+					esteToken.setText(new String[] {""+linha, Semantico.legenda[estaLinha.codigo], ""+estaLinha.op1, ""+estaLinha.op2});
+				}
+				tabela.setHeaderVisible(true);
+				tabela.setLinesVisible(true);
+				tabela.setBounds(20, 20, 360, 500);
+				tabela.getColumn(0).pack();
+				tabela.getColumn(1).pack();
+				tabela.getColumn(2).pack();
+				tabela.getColumn(3).pack();
+				
+				shellInstruc.pack();
+				shellInstruc.open();
 			}
 		});
 		shell.open();

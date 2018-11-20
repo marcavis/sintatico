@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import hipotetica.AreaInstrucoes;
 import hipotetica.Tipos;
 
 public class Sintatico {
@@ -213,7 +214,7 @@ public class Sintatico {
 		return tabela;
     }
 	
-	public static void analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
+	public static AreaInstrucoes analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
 		String penultimoLexema = ""; //acoes semanticas podem precisar voltar atrás no código fonte
 		//para acessar identificadores depois de o léxico já ter avançado
 		char[] fonte = new char[codigoFonte.length()];
@@ -327,7 +328,8 @@ public class Sintatico {
 		}
 		
 		System.out.println("Arquivo processado com sucesso.");
-
+		System.out.println(Semantico.simbolos);
+		
 		if(semantico) {
 			int i = 0;
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
@@ -338,9 +340,12 @@ public class Sintatico {
 				System.out.println("" + i + " " + Semantico.legenda[t.codigo] + ", " + op1 + ", " + op2);
 				i++;
 			}
+			return Semantico.areaInstrucoes;
+		} else {
+			return null;
 		}
 		
-		System.out.println(Semantico.simbolos);
+		
 	}
 	
 }
