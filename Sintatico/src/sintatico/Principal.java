@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import hipotetica.AreaInstrucoes;
+import hipotetica.Hipotetica;
 import hipotetica.Tipos;
 
 import org.eclipse.swt.custom.StyleRange;
@@ -228,9 +229,10 @@ public class Principal {
 				caixaDeCodigo.setText(caixaDeCodigo.getText());
 				int linhaDoErro = -1;
 				String msgErro = "";
-				AreaInstrucoes ai = new AreaInstrucoes();
+				AreaInstrucoes ai = null;
 				try {
-					ai = Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), true);
+					Sintatico.analisar(shell, caixaDeCodigo.getText().trim(), true);
+					ai = Semantico.areaInstrucoes;
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -253,7 +255,7 @@ public class Principal {
 				}
 				
 				Shell shellInstruc = new Shell(display);
-				shellInstruc.setSize(400, 600);
+				shellInstruc.setSize(600, 600);
 				
 				Table tabela = new Table(shellInstruc, SWT.BORDER | SWT.V_SCROLL
 						| SWT.H_SCROLL);
@@ -266,7 +268,8 @@ public class Principal {
 				for (int linha = 1; linha < ai.LC; linha++) {
 					TableItem esteToken = new TableItem(tabela, SWT.NONE);
 					Tipos estaLinha = ai.AI[linha]; 
-					esteToken.setText(new String[] {""+linha, Semantico.legenda[estaLinha.codigo], ""+estaLinha.op1, ""+estaLinha.op2});
+					int mnem = estaLinha.codigo;
+					esteToken.setText(new String[] {""+linha, Semantico.legenda[mnem], mostraOP1(estaLinha.op1, mnem), mostraOP2(estaLinha.op2, mnem)});
 				}
 				tabela.setHeaderVisible(true);
 				tabela.setLinesVisible(true);
@@ -275,6 +278,16 @@ public class Principal {
 				tabela.getColumn(1).pack();
 				tabela.getColumn(2).pack();
 				tabela.getColumn(3).pack();
+				
+				
+				Button btnExecutar = new Button(shellInstruc, SWT.NONE);
+				btnExecutar.setBounds(400, 400, 100, 36);
+				btnExecutar.setText("Executar");
+				btnExecutar.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						Hipotetica.Interpreta(Semantico.areaInstrucoes, Semantico.areaLiterais);
+					}
+				});
 				
 				shellInstruc.pack();
 				shellInstruc.open();
@@ -287,6 +300,25 @@ public class Principal {
 				display.sleep();
 		}
 		display.dispose();
+	}
+	
+	static String mostraOP1(int op1, int instrucao) {
+		switch (instrucao) {
+		case 2: case 4: case 25:
+			return ""+op1;
+		default:
+			return "-";
+		}	
+	}
+	
+	static String mostraOP2(int op2, int instrucao) {
+		switch (instrucao) {
+		case 1: case 2: case 3: case 4: case 19: 
+		case 20: case 23: case 24: case 25: case 29:
+			return ""+op2;
+		default:
+			return "-";
+		}
 	}
 	
 	static String readFile(String path, Charset encoding) 

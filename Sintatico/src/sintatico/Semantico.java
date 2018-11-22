@@ -14,7 +14,7 @@ public class Semantico {
 	static int numParametros;
 	static int deslocamento;
 	static int lc; //indice da areaInstrucoes
-	static int lit; //indice da areaLiteraiss
+	static int lit; //indice da areaLiterais
 	static int tipoId; //tipo do próximo identificador a ser incluído, variável ou parâmetro
 	static String enderecoConst = "";
 	static boolean houveParametro;
@@ -27,6 +27,7 @@ public class Semantico {
 	static int deslocamentoId = 0;
 	static int contexto = 0;
 	static String idDaProc = "";
+	static int ultimoNumeroCase = 0;
 	
 	static PilhaDinamica<Integer> pilhaIf = new PilhaDinamica<Integer>();
 	static PilhaDinamica<Integer> pilhaFor = new PilhaDinamica<Integer>();
@@ -34,6 +35,9 @@ public class Semantico {
 	static PilhaDinamica<Integer> pilhaSaidaFor = new PilhaDinamica<Integer>();
 	static PilhaDinamica<Integer> pilhaWhile = new PilhaDinamica<Integer>();
 	static PilhaDinamica<Integer> pilhaRepeat = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaCaseDSVT = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaCaseDSVS = new PilhaDinamica<Integer>();
+	static PilhaDinamica<Integer> pilhaCaseDSVF = new PilhaDinamica<Integer>();
 	static PilhaDinamica<String> pilhaPar = new PilhaDinamica<String>();
 	static PilhaDinamica<Integer> pilhaNumPar = new PilhaDinamica<Integer>();
 	static PilhaDinamica<Integer> pilhaDesvios = new PilhaDinamica<Integer>(); //usada para desvios de procedures
@@ -216,7 +220,6 @@ public class Semantico {
 				try {
 					System.out.println(simbolos.buscar(par));
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				i++;
@@ -349,19 +352,38 @@ public class Semantico {
 			incluiInstrucao(IMPR, -1, -1);
 			break;
 		case 132:
-			//TODO
 			break;
 		case 133:
-			//TODO
+			while(pilhaCaseDSVS.tamanho() > 0) {
+				alteraInstrucao(pilhaCaseDSVS.retirar(), -1, areaInstrucoes.LC);
+			}
+			incluiInstrucao(AMEM, -1, -1);
 			break;
 		case 134:
-			//TODO
+			incluiInstrucao(COPI, -1, -1);
+			System.out.println(nome);
+			incluiInstrucao(CRCT, -1, ultimoNumeroCase);
+			incluiInstrucao(CMIG, -1, -1);
+			while(pilhaCaseDSVT.tamanho() > 0) {
+				alteraInstrucao(pilhaCaseDSVT.retirar(), -1, areaInstrucoes.LC+1);
+			}
+			pilhaCaseDSVF.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVF, -1, -1);
 			break;
 		case 135:
-			//TODO
+			alteraInstrucao(pilhaCaseDSVF.retirar(), -1, areaInstrucoes.LC+1);
+			pilhaCaseDSVS.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVS, -1, -1);
 			break;
 		case 136:
-			//TODO
+			incluiInstrucao(COPI, -1, -1);
+			System.out.println(nome);
+			incluiInstrucao(CRCT, -1, ultimoNumeroCase);
+			incluiInstrucao(CMIG, -1, -1);
+			pilhaCaseDSVT.inserir(areaInstrucoes.LC);
+			incluiInstrucao(DSVT, -1, -1);
+			//System.out.println(nome);
+			//System.exit(0);
 			break;
 		case 137:
 			try {
@@ -446,9 +468,12 @@ public class Semantico {
 		case 156:
 			contexto = C_EXPRESSAO;
 			break;
-		default:
-			//TODO = comando não existe
+		case 157:
+			ultimoNumeroCase = Integer.parseInt(nome);
 			break;
+		default:
+			throw new SintaticoException("Instrução desconhecida", linha);
+			//comando não existe
 		}
 		
 	}
@@ -464,22 +489,4 @@ public class Semantico {
 	public static void alteraInstrucao(int indice, int op1, int op2) {
 		Hipotetica.AlterarAI(areaInstrucoes, indice, op1, op2);
 	}
-	
-//	public static void inserirTS(String nome, Categoria cat, int linha) {
-//		int retorno = simbolos.inserir(new Simbolo(nome, cat, nivelAtual, deslocamento + numVariaveis));
-//		if(retorno == -1) {
-//			//símbolo com esse nome já existe
-//			Simbolo existente = new Simbolo("");
-//			try {
-//				existente = simbolos.buscar(nome);
-//			} catch (Exception e) { //não acontecerá, pois a falha na inclusão indica que o símbolo existe
-//			}
-//			if(existente.getNivel() == nivelAtual) {
-//				throw new SintaticoException("Símbolo " + nome + " já existe na tabela neste escopo", linha);
-//			}
-//			//já existe mas foi declarado em um escopo diferente, então podemos
-//			//inserir um símbolo novo com um nome diferente
-//			conversaoAlfa(new Simbolo(nome, cat, nivelAtual, deslocamento + numVariaveis));
-//		}
-//	}
 }

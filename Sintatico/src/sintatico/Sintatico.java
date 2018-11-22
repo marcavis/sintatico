@@ -98,8 +98,8 @@ public class Sintatico {
         {   0 },
         {   4,  65,  66 },
         {  44, 132,  67,  45,  74,  27, 133 },
-        {  20,  76,   7, 134,  59, 135,  75 },
-        {   4, 136,  20,  76 },
+        {  20, 157,  76, 134,   7,  59, 135,  75 }, //alterada manualmente ref. tratamento do case
+        { 136,   4,  20, 157,  76 }, //alterada manualmente ref. tratamento do case
         {   0 },
         {   0 },
         {   5,  74 },
@@ -174,7 +174,7 @@ public class Sintatico {
             "#120","#121","#122","#123","#124","#125","#126","#127","#128","#129",
             "#130","#131","#132","#133","#134","#135","#136","#137","#138","#139",
             "#140","#141","#142","#143","#144","#145","#146","#147","#148","#149",
-            "#150","#151","#152","#153","#154","#155","#156"
+            "#150","#151","#152","#153","#154","#155","#156","#157"
     };
     
     //Executa apenas a análise léxica, mas adicionalmente retorna uma tabela dos tokens identificados
@@ -214,7 +214,7 @@ public class Sintatico {
 		return tabela;
     }
 	
-	public static AreaInstrucoes analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
+	public static void analisar(Shell shell, String codigoFonte, boolean semantico) throws Exception {
 		String penultimoLexema = ""; //acoes semanticas podem precisar voltar atrás no código fonte
 		//para acessar identificadores depois de o léxico já ter avançado
 		char[] fonte = new char[codigoFonte.length()];
@@ -330,6 +330,10 @@ public class Sintatico {
 		System.out.println("Arquivo processado com sucesso.");
 		System.out.println(Semantico.simbolos);
 		
+		System.out.println(Semantico.pilhaCaseDSVF.tamanho());
+		System.out.println(Semantico.pilhaCaseDSVS.tamanho());
+		System.out.println(Semantico.pilhaCaseDSVT.tamanho());
+		
 		if(semantico) {
 			int i = 0;
 			for (Tipos t : Semantico.areaInstrucoes.AI) {
@@ -340,10 +344,7 @@ public class Sintatico {
 				System.out.println("" + i + " " + Semantico.legenda[t.codigo] + ", " + op1 + ", " + op2);
 				i++;
 			}
-			return Semantico.areaInstrucoes;
-		} else {
-			return null;
-		}
+		} 
 		
 		
 	}

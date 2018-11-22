@@ -9,6 +9,7 @@ public class Lexico {
 	private int estado;
 	private String esteToken;
 	private String ultimoLexema;
+	private int ultimoNumero;
 	
 	//estados possíveis:
 	final int ENEUTRO = 0;
@@ -103,6 +104,7 @@ public class Lexico {
 	public String getUltimoLexema() {
 		return ultimoLexema;
 	}
+
 
 	//função que, partindo da posição do cursor (variável "posicao" dentro do arquivo), captura o token seguinte
 	public int proxToken() throws Exception {
