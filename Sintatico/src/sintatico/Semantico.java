@@ -468,7 +468,8 @@ public class Semantico {
 		case 156:
 			contexto = C_EXPRESSAO;
 			break;
-		case 157:
+		case 157: //ação semântica adicional que trata os números logo que encontrados
+			//nas linhas case x, y, z:
 			ultimoNumeroCase = Integer.parseInt(nome);
 			break;
 		default:
